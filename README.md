@@ -91,3 +91,5 @@ The previous escort-to-plaza objective has been replaced. Each contact now requi
 - A GitHub Actions Playwright workflow runs a browser-level smoke/regression test on pushes to `main`.
 - The test-only API is exposed exclusively when the page URL includes `?e2e=1`; normal players do not receive the test hooks.
 - The browser test covers scenario selection, audio control, station briefing, deployment, radio check, resident conversations, scenario-specific dispatch decisions, incident closure, return to station, next call-out reset and career persistence.
+
+- Regression test interaction order corrected: the opening briefing overlay intentionally blocks the top-bar audio control until the operations room is entered. Audio toggling is now tested after entering the station.
