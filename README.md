@@ -86,3 +86,8 @@ The previous escort-to-plaza objective has been replaced. Each contact now requi
 - Audio now reuses one Web Audio context and fades the ambient layer in/out instead of creating a new context on every toggle.
 
 - Dispatch updates now present scenario-specific decision labels and record distinct outcomes for all five call-outs. The incident log differentiates unverified information, corroboration requests, welfare referrals and follow-up arrangements.
+
+## Automated browser test
+- A GitHub Actions Playwright workflow runs a browser-level smoke/regression test on pushes to `main`.
+- The test-only API is exposed exclusively when the page URL includes `?e2e=1`; normal players do not receive the test hooks.
+- The browser test covers scenario selection, audio control, station briefing, deployment, radio check, resident conversations, scenario-specific dispatch decisions, incident closure, return to station, next call-out reset and career persistence.
