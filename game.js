@@ -195,6 +195,11 @@ readPreparation();
 const scenarioSelect=document.querySelector('#scenario-select');
 scenarioSelect?.addEventListener('change',()=>{activeScenarioKey=scenarioSelect.value;activeScenario=scenarios[activeScenarioKey]||scenarios.welfare;applyScenarioContacts();document.querySelector('#brief-lead').textContent=activeScenario.lead;document.querySelector('#scenario-description').textContent=activeScenario.description;document.querySelector('#mission-title').textContent=activeScenario.title;document.querySelector('#mission-subline').textContent=activeScenario.sector;});
 let yaw=0,pitch=0,started=false,inStation=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false,radioReady=false,teamBriefed=false,radioEntries=[],missionStartElapsed=0,dispatchEventOne=false,dispatchEventTwo=false,activeDispatch=null,dispatchResolved=0,teamAssignments=[],teamActivities=[],briefingTask='Resident support',missionStartedAt=0,missionEndedAt=0,decisionScore=0,verifiedInfo=0,supportActions=0;
+const careerStorageKey='losSuenosUnit04Career';
+function loadCareer(){try{return Object.assign({calls:0,experience:0,excellent:0,commendable:0,lastRating:'NO RECORD',lastScenario:'NONE'},JSON.parse(localStorage.getItem(careerStorageKey)||'{}'))}catch{return {calls:0,experience:0,excellent:0,commendable:0,lastRating:'NO RECORD',lastScenario:'NONE'}}}
+const career=loadCareer();
+function saveCareer(){try{localStorage.setItem(careerStorageKey,JSON.stringify(career))}catch(e){toast('Career record could not be saved on this device.')}}
+function renderCareer(){const el=document.querySelector('#career-record');if(el)el.innerHTML='<div><span>COMPLETED CALL-OUTS</span><b>'+career.calls+'</b></div><div><span>UNIT EXPERIENCE</span><b>'+career.experience+' XP</b></div><div><span>EXCELLENT REPORTS</span><b>'+career.excellent+'</b></div><div><span>COMMENDABLE REPORTS</span><b>'+career.commendable+'</b></div><div><span>LAST CALL-OUT</span><b>'+career.lastScenario+'</b></div><div><span>LAST RATING</span><b>'+career.lastRating+'</b></div>'}
 const keys={};const clock=new THREE.Clock();
 
 const interaction=document.querySelector('#interaction');
@@ -248,6 +253,11 @@ function start(){
  toast('Operations room active. Confirm team assignments before deployment.');
 }
 document.querySelector('#start').addEventListener('click',start);
+document.querySelector('#return-station')?.addEventListener('click',()=>{
+ completeScreen.classList.add('hidden');inStation=true;paused=false;camera.position.set(0,1.72,-61.8);yaw=0;pitch=0;
+ document.querySelector('#station-console')?.classList.remove('hidden');document.querySelector('#debrief-summary')?.classList.remove('hidden');
+ renderCareer();logRadio('UNIT 04: Returned to operations room. Post-call debrief is available.');toast('Back at the station. Review the unit career record.');
+});
 document.querySelector('#deploy-unit')?.addEventListener('click',()=>{
  if(!teamBriefed){toast('Issue the team briefing before deployment.');return}
  if(!readPreparation())return;
@@ -289,6 +299,9 @@ function closeIncident(){
  const thoughtfulSupport=residents.filter(person=>person.informed&&person.needsDiscussed).length;
  missionEndedAt=performance.now();
  const rating=!radioReady?'COMMS INCOMPLETE':thoughtfulSupport===3&&decisionScore>=16?'EXCELLENT':thoughtfulSupport>=1?'COMMENDABLE':'COMPLETED';
+ const earned=rating==='EXCELLENT'?150:rating==='COMMENDABLE'?100:60;
+ career.calls++;career.experience+=earned;if(rating==='EXCELLENT')career.excellent++;if(rating==='COMMENDABLE')career.commendable++;
+ career.lastRating=rating;career.lastScenario=activeScenario.title;saveCareer();
  const duration=Math.max(0,Math.round((missionEndedAt-missionStartedAt)/1000));
  const mins=String(Math.floor(duration/60)).padStart(2,'0'),secs=String(duration%60).padStart(2,'0');
  const report=document.querySelector('#report-details');
