@@ -68,7 +68,7 @@ try {
 
   await page.locator('#scenario-select').selectOption('square');
   assert.match(await page.locator('#mission-title').textContent(),/MARKET SQUARE/);
-  await page.reload({waitUntil:'networkidle'});
+  await page.reload({waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>!!window.__LOS_E2E__);
   assert.equal((await page.evaluate(()=>window.__LOS_E2E__.career())).calls,1,'career should persist after reload');
   assert.equal(pageErrors.length,0,'browser should have no uncaught JavaScript errors');
