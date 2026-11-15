@@ -6,6 +6,7 @@ const errors=[];page.on('pageerror',e=>errors.push(e.message));
 try{
  await page.goto('http://127.0.0.1:4173/?e2e=1',{waitUntil:'domcontentloaded',timeout:60000});
  await page.waitForSelector('canvas',{timeout:20000});await page.waitForFunction(()=>!!window.__SANVEGA_E2E__,null,{timeout:10000});
+ const worldStats=await page.evaluate(()=>window.__SANVEGA_E2E__.state());assert.equal(worldStats.trafficCount,6);assert.ok(worldStats.pedestrianCount>=12);
  assert.equal(await page.locator('#intro').isVisible(),true);
  await page.locator('#start-shift').click();assert.equal((await page.evaluate(()=>window.__SANVEGA_E2E__.state())).onDuty,true);
  assert.match(await page.locator('#duty-state').textContent(),/ON DUTY/);
