@@ -427,7 +427,7 @@ document.addEventListener('keyup',e=>keys[e.code]=false);
 renderer.domElement.addEventListener('click',()=>{if(started&&!paused&&!complete&&document.pointerLockElement!==renderer.domElement)renderer.domElement.requestPointerLock?.()});
 function openDialogue(r){
  if(!r||r.state!=='waiting')return;
- selectedResident=r;dialogueOpen=true;dialogueName.textContent=r.name.toUpperCase();
+ selectedResident=r;dialogueOpen=true;document.exitPointerLock?.();dialogueName.textContent=r.name.toUpperCase();
  dialogueLine.textContent=r.informed?'Thank you for explaining. What would you like me to do?':(r.opening||'Can you tell me what you know about this incident?');
  dialogue.classList.remove('hidden');interaction.classList.remove('visible');
 }
