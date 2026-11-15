@@ -411,7 +411,7 @@ document.querySelector('#deploy-unit')?.addEventListener('click',()=>{
 });
 document.querySelector('#resume').addEventListener('click',()=>{paused=false;pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.()});
 document.querySelector('#replay').addEventListener('click',()=>location.reload());
-document.addEventListener('pointerlockchange',()=>{if(started&&!complete&&!dialogueOpen&&document.pointerLockElement!==renderer.domElement&&!paused){paused=true;pauseScreen.classList.remove('hidden')}});
+document.addEventListener('pointerlockchange',()=>{if(started&&!complete&&!dialogueOpen&&!activeDispatch&&document.pointerLockElement!==renderer.domElement&&!paused){paused=true;pauseScreen.classList.remove('hidden')}});
 document.addEventListener('mousemove',e=>{if(document.pointerLockElement===renderer.domElement){yaw-=e.movementX*.0022;pitch-=e.movementY*.0018;pitch=Math.max(-1.25,Math.min(1.25,pitch))}});
 document.addEventListener('keydown',e=>{
  keys[e.code]=true;
@@ -526,6 +526,7 @@ function updateTeamActivities(){
 function raiseDispatchEvent(event){
  if(activeDispatch||complete)return;
  activeDispatch=event;
+ document.exitPointerLock?.();
  updateTeamActivities();
  logRadio('DISPATCH: '+event.title+' — '+event.text);
  updateHud();
