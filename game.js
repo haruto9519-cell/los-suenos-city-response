@@ -105,9 +105,9 @@ box(scene,0,2.8,-76.62,3.9,.05,.05,mats.amber,false);
 const cars=[{x:-4,z:5},{x:4,z:-26}];car(-4,5,0x52656a);car(4,-26,0x8a8172);
 // Resident characters are distinct and visibly identifiable.
 const residents=[
- {person:makePerson(-3.7,-5,0x9a715b,0x303d49),state:'waiting',name:'Resident A'},
- {person:makePerson(3.4,-14,0x667f86,0x4b4d49),state:'waiting',name:'Resident B'},
- {person:makePerson(-2.7,-23,0x9b9b72,0x343c48),state:'waiting',name:'Resident C'}
+ {person:makePerson(-3.7,-5,0x9a715b,0x303d49),state:'waiting',name:'Maya Chen',need:'I am looking for my younger brother. I last saw him near the library.'},
+ {person:makePerson(3.4,-14,0x667f86,0x4b4d49),state:'waiting',name:'Daniel Brooks',need:'I have a mobility concern and would appreciate someone walking with me.'},
+ {person:makePerson(-2.7,-23,0x9b9b72,0x343c48),state:'waiting',name:'Elena Rivera',need:'I am worried about leaving my apartment unattended. I need clear information.'}
 ];
 residents.forEach((r,i)=>{r.person.group.userData.resident=i});
 const assembly=new THREE.Vector3(0,0,-49);
@@ -116,23 +116,52 @@ ring.rotation.x=-Math.PI/2;ring.position.set(0,.22,-48);scene.add(ring);
 const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,4,12),new THREE.MeshBasicMaterial({color:0x7bd0b0,transparent:true,opacity:.24}));beacon.position.set(0,2.1,-48);scene.add(beacon);
 const arrow=new THREE.Mesh(new THREE.ConeGeometry(.55,1.3,4),new THREE.MeshBasicMaterial({color:0xe7b65f}));arrow.rotation.x=Math.PI;arrow.position.set(0,4.4,-48);scene.add(arrow);
 
-let yaw=0,pitch=0,started=false,paused=false,complete=false,assisted=0,activeResident=null;
+let yaw=0,pitch=0,started=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false;
 const keys={};const clock=new THREE.Clock();
 const interaction=document.querySelector('#interaction');
 const interactionText=document.querySelector('#interaction-text');
 const briefing=document.querySelector('#briefing'),pauseScreen=document.querySelector('#pause'),completeScreen=document.querySelector('#complete');
+const dialogue=document.querySelector('#dialogue'),dialogueName=document.querySelector('#dialogue-name'),dialogueLine=document.querySelector('#dialogue-line');
 function toast(message){const el=document.querySelector('#toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1900)}
 function updateHud(){document.querySelector('#objective-count').innerHTML='Residents assisted <strong>'+assisted+' / 3</strong>';document.querySelector('#progress-fill').style.width=(assisted/3*100)+'%'}
 function start(){started=true;paused=false;briefing.classList.add('hidden');pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.();clock.getDelta()}
 document.querySelector('#start').addEventListener('click',start);
 document.querySelector('#resume').addEventListener('click',()=>{paused=false;pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.()});
 document.querySelector('#replay').addEventListener('click',()=>location.reload());
-document.addEventListener('pointerlockchange',()=>{if(started&&!complete&&document.pointerLockElement!==renderer.domElement&&!paused){paused=true;pauseScreen.classList.remove('hidden')}});
+document.addEventListener('pointerlockchange',()=>{if(started&&!complete&&!dialogueOpen&&document.pointerLockElement!==renderer.domElement&&!paused){paused=true;pauseScreen.classList.remove('hidden')}});
 document.addEventListener('mousemove',e=>{if(document.pointerLockElement===renderer.domElement){yaw-=e.movementX*.0022;pitch-=e.movementY*.0018;pitch=Math.max(-1.25,Math.min(1.25,pitch))}});
-document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Escape'&&started&&!complete){paused=true;pauseScreen.classList.remove('hidden')}if(e.code==='KeyE'&&started&&!paused&&!complete)interact()});
+document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Escape'&&dialogueOpen){closeDialogue();return}if(e.code==='Escape'&&started&&!complete){paused=true;pauseScreen.classList.remove('hidden')}if(e.code==='KeyE'&&started&&!paused&&!complete)interact()});
 document.addEventListener('keyup',e=>keys[e.code]=false);
 renderer.domElement.addEventListener('click',()=>{if(started&&!paused&&!complete&&document.pointerLockElement!==renderer.domElement)renderer.domElement.requestPointerLock?.()});
-function interact(){if(!activeResident)return;const r=activeResident;if(r.state!=='waiting')return;r.state='escorting';r.person.group.traverse(o=>{if(o.material?.color)o.material.color.set(0x79a995)});toast('Resident acknowledged. Continue to the assembly point.');interaction.classList.remove('visible');activeResident=null}
+function openDialogue(r){
+ if(!r||r.state!=='waiting')return;
+ selectedResident=r;dialogueOpen=true;dialogueName.textContent=r.name.toUpperCase();
+ dialogueLine.textContent=r.informed?'Thank you for explaining. What would you like me to do?':'Hello. I am not sure what is happening. Can you help me understand?';
+ dialogue.classList.remove('hidden');interaction.classList.remove('visible');
+}
+function closeDialogue(){
+ dialogueOpen=false;dialogue.classList.add('hidden');selectedResident=null;
+ if(started&&!paused&&!complete)renderer.domElement.requestPointerLock?.();
+}
+function chooseDialogue(choice){
+ const r=selectedResident;if(!r||r.state!=='waiting')return;
+ if(choice==='explain'){
+  r.informed=true;dialogueLine.textContent='There is a reported power fault in this area. The community plaza is the designated meeting point, where staff can provide updates.';
+  toast('You explained the situation clearly.');
+ }else if(choice==='needs'){
+  r.needsDiscussed=true;dialogueLine.textContent=r.need;
+  toast('You listened to the resident.');
+ }else if(choice==='guide'){
+  r.state='escorting';r.person.group.traverse(o=>{if(o.material?.color)o.material.color.set(0x79a995)});
+  dialogueLine.textContent='Thank you. I will walk with you to the community plaza.';
+  toast(r.name+' accepted your offer to accompany them.');
+  dialogueOpen=false;dialogue.classList.add('hidden');selectedResident=null;activeResident=null;
+  if(started&&!paused&&!complete)renderer.domElement.requestPointerLock?.();
+ }
+}
+function interact(){if(dialogueOpen){closeDialogue();return}if(activeResident)openDialogue(activeResident)}
+document.querySelectorAll('.dialogue-choice').forEach(button=>button.addEventListener('click',()=>chooseDialogue(button.dataset.choice)));
+document.querySelector('#dialogue-close').addEventListener('click',closeDialogue);
 function nearestResident(){let nearest=null,dist=3.4;for(const r of residents){if(r.state!=='waiting')continue;const d=camera.position.distanceTo(r.person.group.position);if(d<dist){dist=d;nearest=r}}return nearest}
 function update(dt,t){
  const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
@@ -142,7 +171,7 @@ function update(dt,t){
  if(keys.KeyS||keys.ArrowDown)move.sub(forward);
  if(keys.KeyD||keys.ArrowRight)move.add(right);
  if(keys.KeyA||keys.ArrowLeft)move.sub(right);
- if(move.lengthSq()>0){
+ if(move.lengthSq()>0&&!dialogueOpen){
   move.normalize().multiplyScalar((keys.ShiftLeft||keys.ShiftRight?5.0:3.15)*dt);
   // Resolve movement per axis so the player cannot pass through parked vehicles.
   const nextX=camera.position.x+move.x,nextZ=camera.position.z+move.z;
@@ -159,8 +188,8 @@ function update(dt,t){
  camera.position.z=THREE.MathUtils.clamp(camera.position.z,-82,52);
  camera.position.y=1.72;
  camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;
- activeResident=nearestResident();
- if(activeResident){interaction.classList.add('visible');interactionText.textContent='OFFER ASSISTANCE · '+activeResident.name.toUpperCase()}else interaction.classList.remove('visible');
+ activeResident=dialogueOpen?null:nearestResident();
+ if(activeResident){interaction.classList.add('visible');interactionText.textContent='TALK · '+activeResident.name.toUpperCase()}else interaction.classList.remove('visible');
  residents.forEach((r,i)=>{const g=r.person.group;if(r.state==='escorting'){const target=assembly.clone();target.x=(i-1)*1.05;const dir=target.clone().sub(g.position);const distance=dir.length();if(distance>.8){dir.normalize();g.position.addScaledVector(dir,1.3*dt);g.rotation.y=Math.atan2(dir.x,dir.z)}else{r.state='safe';assisted++;updateHud();toast(r.name+' reached the assembly point.');if(assisted===3){complete=true;setTimeout(()=>{completeScreen.classList.remove('hidden');document.exitPointerLock?.();document.querySelector('#final-count').textContent='03 / 03'},800)}}}else if(r.state==='waiting'){g.rotation.y=Math.sin(t*.35+i)*.12}r.person.legs.forEach((leg,j)=>{leg.rotation.x=r.state==='escorting'?Math.sin(t*7+j*Math.PI)*.35:Math.sin(t*1.2+j)*.025})});
  ring.material.opacity=.55+Math.sin(t*2)*.2;arrow.position.y=4.2+Math.sin(t*2)*.18;
  document.querySelector('#clock').textContent=new Date(8*3600*1000+42*60000+Math.floor(t*1000)).toISOString().slice(11,19);
