@@ -66,3 +66,8 @@
 .report-details span{font-size:7px;letter-spacing:.7px;color:#9aabb0}
 .report-details b{font-size:13px;color:#e4c27c;font-variant-numeric:tabular-nums}
 .complete-card{max-height:90vh;overflow-y:auto}
+
+.scenario-select{margin:15px 0 13px;padding:11px;background:rgba(118,145,151,.12);border:1px solid rgba(180,199,200,.2);text-align:left}
+.scenario-select label{display:block;font-size:8px;letter-spacing:1.1px;color:#d9b66e;margin-bottom:7px;font-weight:800}
+.scenario-select select{width:100%;padding:9px 8px;background:#1c2a31;border:1px solid #66777b;color:#edf1ee;font:700 10px Inter,sans-serif}
+.scenario-select p{margin:8px 0 0;color:#b8c6c8;font-size:9px;line-height:1.5}
