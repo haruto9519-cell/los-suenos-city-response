@@ -551,10 +551,11 @@ function resolveDispatch(choice){
  closeIncident();
  if(started&&!complete){paused=false;pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.()}
 }
-document.querySelector('#dispatch-choice-a')?.addEventListener('click',()=>resolveDispatch('verify'));
+document.querySelector('#dispatch-choice-a')?.addEventListener('click',()=>{
+ const id=activeDispatch?.id;resolveDispatch(id==='medical'?'assign':'verify');
+});
 document.querySelector('#dispatch-choice-b')?.addEventListener('click',()=>{
- const id=activeDispatch?.id;
- resolveDispatch(id==='medical'?'assign':'request');
+ const id=activeDispatch?.id;resolveDispatch(id==='medical'?'monitor':'request');
 });
 
 function nearestResident(){let nearest=null,dist=3.4;for(const r of residents){if(r.state!=='waiting')continue;const d=camera.position.distanceTo(r.person.group.position);if(d<dist){dist=d;nearest=r}}return nearest}
