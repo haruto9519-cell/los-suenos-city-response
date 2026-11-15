@@ -110,11 +110,6 @@ const residents=[
  {person:makePerson(-2.7,-23,0x9b9b72,0x343c48),state:'waiting',name:'Elena Rivera',need:'I am worried about leaving my apartment unattended. I need clear information.'}
 ];
 residents.forEach((r,i)=>{r.person.group.userData.resident=i});
-const assembly=new THREE.Vector3(0,0,-49);
-const ring=new THREE.Mesh(new THREE.RingGeometry(3.2,3.55,48),new THREE.MeshBasicMaterial({color:0x75d0b0,side:THREE.DoubleSide,transparent:true,opacity:.8}));
-ring.rotation.x=-Math.PI/2;ring.position.set(0,.22,-48);scene.add(ring);
-const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,4,12),new THREE.MeshBasicMaterial({color:0x7bd0b0,transparent:true,opacity:.24}));beacon.position.set(0,2.1,-48);scene.add(beacon);
-const arrow=new THREE.Mesh(new THREE.ConeGeometry(.55,1.3,4),new THREE.MeshBasicMaterial({color:0xe7b65f}));arrow.rotation.x=Math.PI;arrow.position.set(0,4.4,-48);scene.add(arrow);
 
 const scenarios={
  welfare:{title:'CIVIC QUARTER WELFARE CHECK',sector:'SPECIAL RESPONSE / SECTOR 04',lead:'Unit 04 is assigned to a residential welfare call in the Civic Quarter. Establish communications, identify the people involved, assess their needs and complete a documented, peaceful resolution.',description:'A resident welfare call. Speak with the people involved, verify information and arrange appropriate support.',event1:{id:'power',title:'DISPATCH / INFORMATION UPDATE 01',text:'Dispatch advises that the original caller information is incomplete. Confirm details directly and do not treat unverified information as fact.'},event2:{id:'medical',title:'WELFARE SUPPORT / UPDATE 02',text:'A person at the location may need additional assistance. Coordinate an appropriate welfare referral and record the outcome.'}},
@@ -388,36 +383,10 @@ function update(dt,t){
  activeResident=dialogueOpen?null:nearestResident();
  if(activeResident){interaction.classList.add('visible');interactionText.textContent='TALK · '+activeResident.name.toUpperCase()}else interaction.classList.remove('visible');
  residents.forEach((r,i)=>{
- const g=r.person.group;let walking=false;
- if(r.state==='escorting'){
-  // Residents follow the player in a loose, readable formation instead of
-  // teleporting toward the destination. The player must lead them to the plaza.
-  const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
-  const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
-  const target=camera.position.clone().sub(forward.clone().multiplyScalar(1.8+Math.floor(i/2)*.85));
-  target.add(right.multiplyScalar((i-1)*.8));
-  const dir=target.sub(g.position);dir.y=0;
-  const distance=dir.length();
-  if(distance>1.15){dir.normalize();g.position.addScaledVector(dir,Math.min(1.75*dt,distance-1.05));g.rotation.y=Math.atan2(dir.x,dir.z);walking=true}
-  const atPlaza=camera.position.distanceTo(assembly)<4.2&&g.position.distanceTo(assembly)<5.8;
-  if(atPlaza){
-   r.state='safe';assisted++;decisionScore+=2;updateTeamActivities();logRadio('UNIT 04: '+r.name+' arrived at the community plaza.');updateHud();toast(r.name+' has arrived at the community plaza.');
-   if(assisted===3){
-    complete=true;
-    const thoughtfulSupport=residents.filter(person=>person.informed&&person.needsDiscussed).length;
-    missionEndedAt=performance.now();
-    const rating=!radioReady?'COMMS INCOMPLETE':thoughtfulSupport===3&&dispatchResolved===2&&decisionScore>=16?'EXCELLENT':thoughtfulSupport>=1&&dispatchResolved>=1?'COMMENDABLE':'COMPLETED';
-    const duration=Math.max(0,Math.round((missionEndedAt-missionStartedAt)/1000));
-    const mins=String(Math.floor(duration/60)).padStart(2,'0'),secs=String(duration%60).padStart(2,'0');
-    const report=document.querySelector('#report-details');
-    if(report)report.innerHTML='<div><span>MISSION TIME</span><b>'+mins+':'+secs+'</b></div><div><span>DECISION SCORE</span><b>'+decisionScore+'</b></div><div><span>DISPATCH UPDATES</span><b>'+dispatchResolved+'/2</b></div><div><span>VERIFIED INFORMATION</span><b>'+verifiedInfo+'</b></div><div><span>SUPPORT ACTIONS</span><b>'+supportActions+'</b></div><div><span>PEOPLE ASSISTED</span><b>'+assisted+'/3</b></div><div><span>PROTECTIVE EQUIPMENT</span><b>'+prepSelections.protection+'</b></div><div><span>COMMUNICATIONS</span><b>'+prepSelections.comms+'</b></div><div><span>SUPPORT KIT</span><b>'+prepSelections.support+'</b></div>';
-    setTimeout(()=>{completeScreen.classList.remove('hidden');document.exitPointerLock?.();document.querySelector('#final-count').textContent='03 / 03';document.querySelector('#final-rating').textContent=rating},800)
-   }
-  }
- }else if(r.state==='waiting'){g.rotation.y=Math.sin(t*.35+i)*.12}
- r.person.legs.forEach((leg,j)=>{leg.rotation.x=walking?Math.sin(t*7+j*Math.PI)*.35:Math.sin(t*1.2+j)*.025});
-});
- ring.material.opacity=.55+Math.sin(t*2)*.2;arrow.position.y=4.2+Math.sin(t*2)*.18;
+  const g=r.person.group;
+  if(r.state==='waiting')g.rotation.y=Math.sin(t*.35+i)*.12;
+  r.person.legs.forEach((leg,j)=>{leg.rotation.x=Math.sin(t*1.2+j)*.025});
+ });
  document.querySelector('#clock').textContent=new Date(8*3600*1000+42*60000+Math.floor(t*1000)).toISOString().slice(11,19);
  const z=camera.position.z;document.querySelector('#location').textContent=z<-59&&z>-79?'CIVIC QUARTER / COMMUNITY RESPONSE CENTER':z<-38?'CIVIC QUARTER / COMMUNITY PLAZA':z<-15?'CIVIC QUARTER / NORTH AVENUE':z<8?'CIVIC QUARTER / EAST AVENUE':'CIVIC QUARTER / SOUTH AVENUE';
 }
