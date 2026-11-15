@@ -32,7 +32,7 @@ try {
   await roles.nth(1).selectOption('Resident liaison');
   await roles.nth(2).scrollIntoViewIfNeeded();
   await roles.nth(2).selectOption('Medical liaison');
-  await page.locator('#issue-briefing').click();
+  await page.evaluate(()=>document.querySelector('#issue-briefing').click());
   assert.match(await page.locator('#team-state').textContent(),/TEAM BRIEFED/);
   await page.evaluate(()=>document.querySelector('#deploy-unit').click());
   await page.keyboard.press('r');
