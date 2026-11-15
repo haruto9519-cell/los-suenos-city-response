@@ -29,9 +29,9 @@
         <div><small>PRIORITY</small><strong class="amber">PUBLIC SAFETY</strong></div>
         <div><small>OBJECTIVE</small><strong>GUIDE 3 RESIDENTS</strong></div>
       </div>
-      <div class="brief-note"><span>MISSION PARAMETERS</span><p>Keep residents informed. Approach each person and offer assistance. Follow the route markers to the assembly area.</p></div>
+      <div class="brief-note"><span>MISSION PARAMETERS</span><p>Establish radio contact with dispatch (R), confirm resident needs, then coordinate voluntary assistance to the assembly area. Treat unverified reports as unconfirmed.</p></div>
       <button id="start" class="primary-btn">BEGIN RESPONSE <span>→</span></button>
-      <div class="brief-foot">WASD MOVE <i>·</i> MOUSE LOOK <i>·</i> E INTERACT <i>·</i> ESC PAUSE</div>
+      <div class="brief-foot">WASD MOVE <i>·</i> MOUSE LOOK <i>·</i> E INTERACT <i>·</i> R RADIO <i>·</i> ESC PAUSE</div>
     </div>
   </section>
 
@@ -50,6 +50,12 @@
       <div class="resident-row" id="resident-row-0"><span class="resident-dot"></span><span class="resident-name">MAYA CHEN</span><b id="resident-status-0">AWAITING CONTACT</b></div>
       <div class="resident-row" id="resident-row-1"><span class="resident-dot"></span><span class="resident-name">DANIEL BROOKS</span><b id="resident-status-1">AWAITING CONTACT</b></div>
       <div class="resident-row" id="resident-row-2"><span class="resident-dot"></span><span class="resident-name">ELENA RIVERA</span><b id="resident-status-2">AWAITING CONTACT</b></div>
+    </div>
+    <div class="command-net">
+      <div class="roster-title">COMMAND NET / DISPATCH</div>
+      <div class="command-state"><span class="resident-dot" id="radio-dot"></span><b id="radio-state">AWAITING RADIO CHECK</b></div>
+      <p id="radio-log">NO OUTBOUND REPORT RECORDED</p>
+      <div class="command-hint"><kbd>R</kbd> RADIO CHECK</div>
     </div>
     <div class="panel-bottom"><span>ASSEMBLY POINT</span><b>COMMUNITY PLAZA</b></div>
   </aside>
