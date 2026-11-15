@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 const browser = await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const page = await browser.newPage({viewport:{width:1440,height:900}});
+page.setDefaultTimeout(12000);
 const pageErrors=[],consoleErrors=[],failedRequests=[];
 page.on('pageerror',error=>pageErrors.push(error.message));
 page.on('console',msg=>{if(msg.type()==='error')consoleErrors.push(msg.text())});
@@ -13,15 +14,15 @@ try {
   await page.waitForSelector('canvas',{timeout:15000});
   assert.equal(await page.locator('#briefing').isVisible(),true,'briefing should be visible on launch');
 
-  await page.locator('#audio-toggle').click();
-  assert.equal(await page.locator('#audio-toggle').textContent(),'AUDIO ON','audio should turn on');
-  await page.locator('#audio-toggle').click();
-  assert.equal(await page.locator('#audio-toggle').textContent(),'AUDIO OFF','audio should turn off');
-
   await page.locator('#scenario-select').selectOption('transit');
   assert.match(await page.locator('#mission-title').textContent(),/CENTRAL TRANSIT/);
   await page.locator('#start').click();
   await page.locator('#station-console').waitFor({state:'visible'});
+
+  await page.locator('#audio-toggle').click();
+  assert.equal(await page.locator('#audio-toggle').textContent(),'AUDIO ON','audio should turn on');
+  await page.locator('#audio-toggle').click();
+  assert.equal(await page.locator('#audio-toggle').textContent(),'AUDIO OFF','audio should turn off');
   const roles=page.locator('.team-role');
   await roles.nth(0).selectOption('Team coordination');
   await roles.nth(1).selectOption('Resident liaison');
