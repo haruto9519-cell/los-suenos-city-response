@@ -9,7 +9,7 @@ A browser-based 3D police-life simulation prototype set in the fictional West Co
 - PC keyboard/mouse controls and touch controls for phones/tablets.
 - Start a day-watch shift, check in at roll call and collect the marked patrol vehicle.
 - Simplified patrol-car driving and vehicle entry/exit.
-- Expanded pedestrian population with ambient movement and conversation prompts.
+- Thirteen pedestrians follow staggered sidewalk waypoint routes, turn at route ends and remain on the sidewalk corridors; conversation prompts remain available.
 - Six ambient vehicles moving through the main roads.
 - Coordinated two-axis traffic lights with green, yellow and red phases; ambient cars stop at the intersection line when their direction is not permitted.
 - Dispatch sign-on, one routine neighborhood-assistance call, scene marker, arrival report and resident conversation.
