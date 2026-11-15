@@ -9,7 +9,9 @@ A browser-based 3D police-life simulation prototype set in the fictional West Co
 - PC keyboard/mouse controls and touch controls for phones/tablets.
 - Start a day-watch shift, check in at roll call and collect the marked patrol vehicle.
 - Simplified patrol-car driving and vehicle entry/exit.
-- Basic civilian NPCs with ambient movement and conversation prompts.
+- Expanded pedestrian population with ambient movement and conversation prompts.
+- Six ambient vehicles moving through the main roads.
+- Animated traffic signals at the central intersections.
 - Dispatch sign-on, one routine neighborhood-assistance call, scene marker, arrival report and resident conversation.
 - Contact-documentation flow and shift log.
 - Test-only automation hooks enabled only on localhost with the e2e query parameter.
