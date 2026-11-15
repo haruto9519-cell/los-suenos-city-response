@@ -48,3 +48,5 @@ Serve this folder with any static web server. Because the game uses JavaScript E
 ## Project status
 
 This is an early playable prototype, not a finished commercial game. The current mission focuses on public assistance, evacuation, communication and civilian safety.
+
+- Timed dispatch updates: after radio contact and team briefing, utility-status verification and resident-welfare coordination updates arrive during the mission. Player responses are recorded in the radio transcript.
