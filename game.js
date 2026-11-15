@@ -29,7 +29,7 @@ const parked=[car(-7,7,0x9d3830),car(8,-7,0x496c83),car(-18,-8,0xd6d0c2),car(28,
 const patrol=car(-15,11,0x172d42,true);
 const civilians=[person(-2,2,'M. Carter'),person(5,4,'J. Brooks'),person(19,-3,'A. Rivera'),person(-34,-2,'S. Miller'),person(32,20,'D. Hayes')];
 civilians.push(person(-6,14,'R. Foster'),person(6,-14,'K. Young'),person(14,6,'P. Lewis'),person(-14,-6,'T. Adams'),person(34,14,'C. Ward'),person(-34,-14,'N. Price'),person(14,-34,'E. Scott'),person(-14,34,'B. Reed')); 
-const trafficCars=[[-72,-5,0x657b89,1],[54,5,0x9d5546,-1],[-36,5,0x6c765f,1],[76,-5,0xb3a58e,-1],[-5,-72,0x536a79,0],[5,58,0x9d5546,Math.PI]];
+const trafficCars=[[-72,-5,0x657b89,Math.PI/2],[54,5,0x9d5546,-Math.PI/2],[-36,5,0x6c765f,Math.PI/2],[76,-5,0xb3a58e,-Math.PI/2],[-5,-72,0x536a79,0],[5,58,0x9d5546,Math.PI]];
 const traffic=trafficCars.map(([x,z,color,heading])=>{const v=car(x,z,color);v.userData.heading=heading;v.rotation.y=heading;v.userData.traffic=true;v.userData.direction=heading===Math.PI||heading===0?'z':'x';v.userData.speed=4.4+(Math.abs(x+z)%4)*.55;return v});
 const callPoint=new THREE.Vector3(31,0,-28),marker=new THREE.Group();marker.position.copy(callPoint);scene.add(marker);
 const ring=mesh(new THREE.TorusGeometry(2.1,.12,8,40),new THREE.MeshBasicMaterial({color:0xe5bd70}),marker,0,.15,0,false);ring.rotation.x=Math.PI/2;
