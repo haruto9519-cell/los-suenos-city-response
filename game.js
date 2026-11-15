@@ -118,12 +118,25 @@ const arrow=new THREE.Mesh(new THREE.ConeGeometry(.55,1.3,4),new THREE.MeshBasic
 
 let yaw=0,pitch=0,started=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false;
 const keys={};const clock=new THREE.Clock();
+
 const interaction=document.querySelector('#interaction');
 const interactionText=document.querySelector('#interaction-text');
 const briefing=document.querySelector('#briefing'),pauseScreen=document.querySelector('#pause'),completeScreen=document.querySelector('#complete');
 const dialogue=document.querySelector('#dialogue'),dialogueName=document.querySelector('#dialogue-name'),dialogueLine=document.querySelector('#dialogue-line');
 function toast(message){const el=document.querySelector('#toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1900)}
-function updateHud(){document.querySelector('#objective-count').innerHTML='Residents assisted <strong>'+assisted+' / 3</strong>';document.querySelector('#progress-fill').style.width=(assisted/3*100)+'%'}
+function updateHud(){
+ document.querySelector('#objective-count').innerHTML='Residents assisted <strong>'+assisted+' / 3</strong>';
+ document.querySelector('#progress-fill').style.width=(assisted/3*100)+'%';
+ residents.forEach((r,i)=>{
+  const status=document.querySelector('#resident-status-'+i);
+  const row=document.querySelector('#resident-row-'+i);
+  if(!status||!row)return;
+  const labels={waiting:'AWAITING CONTACT',escorting:'FOLLOWING YOU',safe:'AT ASSEMBLY'};
+  status.textContent=labels[r.state]||'UNKNOWN';
+  row.dataset.state=r.state;
+ });
+}
+updateHud();
 function start(){started=true;paused=false;briefing.classList.add('hidden');pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.();clock.getDelta()}
 document.querySelector('#start').addEventListener('click',start);
 document.querySelector('#resume').addEventListener('click',()=>{paused=false;pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.()});
