@@ -56,3 +56,13 @@
 .dispatch-choice.secondary{background:#34464e;color:#e2e9e9;border:1px solid #60747c}
 .dispatch-count{font-size:8px;letter-spacing:.8px;color:#91a4a8;padding:7px 0;border-bottom:1px solid var(--line)}
 @keyframes dispatchPulse{50%{opacity:.35;box-shadow:0 0 2px #e3b55f}}
+
+.team-activity-wrap{padding:10px 0;border-bottom:1px solid var(--line)}
+.team-activity-row{display:flex;justify-content:space-between;gap:8px;padding:5px 0;font-size:8px;line-height:1.4}
+.team-activity-row b{color:#d5dfe1;letter-spacing:.4px}
+.team-activity-row span{color:#d9b66e;text-align:right}
+.report-details{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:13px 0 16px;padding:11px;background:rgba(110,139,143,.12);border:1px solid rgba(160,180,180,.18)}
+.report-details div{display:flex;flex-direction:column;gap:3px}
+.report-details span{font-size:7px;letter-spacing:.7px;color:#9aabb0}
+.report-details b{font-size:13px;color:#e4c27c;font-variant-numeric:tabular-nums}
+.complete-card{max-height:90vh;overflow-y:auto}
