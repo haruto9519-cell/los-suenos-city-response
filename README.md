@@ -74,3 +74,9 @@ The player begins in a furnished Unit 04 operations room with a wall briefing di
 
 ## Incident casework update
 The previous escort-to-plaza objective has been replaced. Each contact now requires an explanation of confirmed information, a conversation about individual needs, and an explicit documented close-out. Dispatch updates must also be acknowledged before the incident can be closed. The after-action report records completed contacts and verified information.
+
+## Immersion / test-build pass
+- Added an optional procedural ambient audio bed, radio acknowledgement tones and soft movement footsteps; audio starts only after the player enters the experience and can be muted from the top bar.
+- Added street furniture, planters, bins, road markings and district signage to give the playable block more visual landmarks.
+- Added subtle first-person movement head-bob and a responsive audio control.
+- Audio is synthesized locally with Web Audio; no external sound files or tracking services are used.
