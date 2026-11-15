@@ -66,6 +66,13 @@
       <div class="command-state" id="team-state">BRIEFING REQUIRED</div>
       <button id="issue-briefing" class="briefing-btn">ISSUE TEAM BRIEFING</button>
     </div>
+    <div class="dispatch-event hidden" id="dispatch-event" aria-live="assertive">
+      <div class="dispatch-event-head"><span class="live-indicator"></span><b id="dispatch-event-title">DISPATCH UPDATE</b></div>
+      <p id="dispatch-event-text"></p>
+      <button id="dispatch-choice-a" class="dispatch-choice">ACKNOWLEDGE / VERIFY</button>
+      <button id="dispatch-choice-b" class="dispatch-choice secondary">REQUEST SUPPORT</button>
+    </div>
+    <div class="dispatch-count" id="dispatch-count">UPDATES RESOLVED: 0/2</div>
     <div class="radio-transcript-wrap"><div class="roster-title">RADIO TRAFFIC / LAST MESSAGES</div><div id="radio-transcript" aria-live="polite"><div class="radio-entry muted">NO TRAFFIC LOGGED</div></div></div>
     <div class="panel-bottom"><span>ASSEMBLY POINT</span><b>COMMUNITY PLAZA</b></div>
   </aside>
