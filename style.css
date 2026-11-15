@@ -33,3 +33,16 @@
 .command-hint kbd{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-right:5px;border:1px solid #dcae6177;color:#f0c77e;background:#ffffff08;font:700 9px Inter,sans-serif}
 .command-state.ready{color:#8bd8cc}
 .command-state.ready .resident-dot{background:#77c9bd;box-shadow:0 0 8px #77c9bd88}
+
+/* Team assignment and radio transcript */
+.team-command{padding:12px 0 10px;border-bottom:1px solid var(--line)}
+.team-member{display:grid;grid-template-columns:94px minmax(0,1fr);align-items:center;gap:7px;margin:7px 0;color:#b7c3c7;font-size:8px;letter-spacing:.55px}
+.team-member select{width:100%;min-width:0;background:#1c2a31;border:1px solid #52616a;color:#e7edef;padding:6px 5px;font:600 8px Inter,sans-serif}
+.task-member{margin-top:11px}
+.briefing-btn{width:100%;margin-top:9px;padding:8px;background:#dcae61;border:0;color:#172026;font:800 9px Inter,sans-serif;letter-spacing:.8px;cursor:pointer}
+.radio-transcript-wrap{padding:11px 0;border-bottom:1px solid var(--line)}
+.radio-entry{font-size:8px;line-height:1.55;color:#c5d0d3;padding:3px 0}
+.radio-entry span{color:#d9b66e;font-variant-numeric:tabular-nums;margin-right:5px}
+.radio-entry.muted{color:#77878e}
+.mission-panel{max-height:calc(100vh - 92px);overflow-y:auto;scrollbar-width:thin}
+@media(max-width:650px){.mission-panel{max-height:calc(100vh - 84px)}.team-member{grid-template-columns:85px minmax(0,1fr)}}
