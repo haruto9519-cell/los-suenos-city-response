@@ -39,7 +39,7 @@ Serve this folder with any static web server. Because the game uses JavaScript E
 
 ## Roadmap
 
-1. Build a dedicated police-station operations hub and add visible unit personnel.
+1. Add a return-to-station sequence and a dedicated post-call debrief scene.
 2. Add conversation memory and more varied assistance outcomes.
 3. Add additional enterable buildings and richer environmental storytelling.
 4. Add additional districts, mission scenarios and persistent progression.
@@ -65,6 +65,9 @@ The call-out selector offers Civic Quarter Welfare Check, Civic Quarter Missing 
 
 ## Pre-deployment preparation
 Added a pre-deployment preparation panel with selectable protective equipment, communications equipment and support equipment. The selected configuration is logged at call-out acceptance and included in the after-action report. This is a presentation and continuity feature; selections do not provide real-world tactical guidance or change weapon capabilities.
+
+## 3D operations room
+The player begins in a furnished Unit 04 operations room with a wall briefing display, workstations and three visible unit members. The player reviews the team panel, issues a distinct-responsibility briefing and then deploys to the city. Mission timing and dispatch updates begin on deployment, not while standing in the station.
 
 ## Incident casework update
 The previous escort-to-plaza objective has been replaced. Each contact now requires an explanation of confirmed information, a conversation about individual needs, and an explicit documented close-out. Dispatch updates must also be acknowledged before the incident can be closed. The after-action report records completed contacts and verified information.
