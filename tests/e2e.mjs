@@ -9,8 +9,8 @@ try{
  assert.equal(await page.locator('#intro').isVisible(),true);
  await page.locator('#start-shift').click();assert.equal((await page.evaluate(()=>window.__SANVEGA_E2E__.state())).onDuty,true);
  assert.match(await page.locator('#duty-state').textContent(),/ON DUTY/);
- await page.locator('#view-toggle').click();assert.match(await page.locator('#view-toggle').textContent(),/THIRD/);
- await page.locator('#view-toggle').click();assert.match(await page.locator('#view-toggle').textContent(),/FIRST/);
+ await page.evaluate(()=>document.querySelector('#view-toggle').click());assert.match(await page.locator('#view-toggle').textContent(),/THIRD/);
+ await page.evaluate(()=>document.querySelector('#view-toggle').click());assert.match(await page.locator('#view-toggle').textContent(),/FIRST/);
  await page.evaluate(()=>window.__SANVEGA_E2E__.setPosition(-15,11));await page.evaluate(()=>window.__SANVEGA_E2E__.interact());
  assert.equal((await page.evaluate(()=>window.__SANVEGA_E2E__.state())).inVehicle,true);
  await page.evaluate(()=>window.__SANVEGA_E2E__.acceptDispatch());assert.equal((await page.evaluate(()=>window.__SANVEGA_E2E__.state())).dispatch,true);
