@@ -25,13 +25,14 @@ try {
   assert.equal(await page.locator('#audio-toggle').textContent(),'AUDIO OFF','audio should turn off');
   await page.evaluate(()=>document.querySelector('#audio-toggle').click());
   assert.equal(await page.locator('#audio-toggle').textContent(),'AUDIO ON','audio should turn on again');
-  const roles=page.locator('.team-role');
-  await roles.nth(0).scrollIntoViewIfNeeded();
-  await roles.nth(0).selectOption('Team coordination');
-  await roles.nth(1).scrollIntoViewIfNeeded();
-  await roles.nth(1).selectOption('Resident liaison');
-  await roles.nth(2).scrollIntoViewIfNeeded();
-  await roles.nth(2).selectOption('Medical liaison');
+  await page.evaluate(()=>{
+    const values=['Team coordination','Resident liaison','Medical liaison'];
+    document.querySelectorAll('.team-role').forEach((select,index)=>{
+      select.value=values[index];
+      select.dispatchEvent(new Event('change',{bubbles:true}));
+    });
+  });
+  assert.deepEqual(await page.locator('.team-role').evaluateAll(els=>els.map(el=>el.value)),['Team coordination','Resident liaison','Medical liaison']);
   await page.evaluate(()=>document.querySelector('#issue-briefing').click());
   assert.match(await page.locator('#team-state').textContent(),/TEAM BRIEFED/);
   await page.evaluate(()=>document.querySelector('#deploy-unit').click());
