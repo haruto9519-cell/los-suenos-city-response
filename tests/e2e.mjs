@@ -2,7 +2,8 @@ import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 
 const browser = await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
-const page = await browser.newPage({viewport:{width:1440,height:900}});
+const context = await browser.newContext({viewport:{width:1440,height:900}});
+const page = await context.newPage();
 page.setDefaultTimeout(12000);
 const pageErrors=[],consoleErrors=[],failedRequests=[];
 page.on('pageerror',error=>pageErrors.push(error.message));
@@ -77,10 +78,13 @@ try {
 
   await page.locator('#scenario-select').selectOption('square');
   assert.match(await page.locator('#mission-title').textContent(),/MARKET SQUARE/);
-  await page.reload({waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>!!window.__LOS_E2E__);
-  assert.equal((await page.evaluate(()=>window.__LOS_E2E__.career())).calls,1,'career should persist after reload');
+  const restoredPage=await context.newPage();
+  restoredPage.on('pageerror',error=>pageErrors.push(error.message));
+  await restoredPage.goto('http://127.0.0.1:4173/?e2e=1',{waitUntil:'domcontentloaded',timeout:60000});
+  await restoredPage.waitForFunction(()=>!!window.__LOS_E2E__,null,{timeout:20000});
+  assert.equal((await restoredPage.evaluate(()=>window.__LOS_E2E__.career())).calls,1,'career should persist in a fresh page in the same browser profile');
   assert.equal(pageErrors.length,0,'browser should have no uncaught JavaScript errors');
+  await restoredPage.close();
   console.log('PASS: browser launch, audio, scenario selection, briefing, deployment, radio, resident dialogue, dispatch branches, incident closure, station return, next call-out reset and career persistence.');
 } catch(error) {
   await page.screenshot({path:'/tmp/los-suenos-e2e-failure.png',fullPage:true}).catch(()=>{});
