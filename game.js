@@ -57,6 +57,29 @@ function makeBuilding(x,z,w,d,h,wall,seed=0){
  for(let k=0;k<3;k++)box(g,-w*.35+k*w*.35,h*.72,d/2+.08,.12,.55,.12,mats.amber,false);
  return g;
 }
+
+function streetBench(x,z,rotation=0){
+ const g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=rotation;scene.add(g);
+ const wood=mat(0x65564a),metal=mat(0x303b40,.55,.35);
+ box(g,0,.62,0,1.65,.12,.48,wood);box(g,0,.98,-.19,1.65,.58,.12,wood);
+ for(const dx of [-.62,.62]){box(g,dx,.31,0,.09,.62,.09,metal);box(g,dx,.58,0,.12,.08,.62,metal)}
+}
+function streetBin(x,z){
+ const metal=mat(0x3d4a4d,.6,.25);cylinder(scene,x,.55,z,.32,.27,1.05,metal,12);
+ const lid=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.08,12),mat(0x202b30));lid.position.set(x,1.1,z);scene.add(lid);
+}
+function planter(x,z){
+ const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
+ box(g,0,.35,0,1.65,.7,.72,mat(0x77766b));
+ for(let i=0;i<5;i++){const shrub=new THREE.Mesh(new THREE.IcosahedronGeometry(.28,1),mats.leaf);shrub.position.set(-.58+i*.29,.83,0);shrub.scale.set(1,.8,1);g.add(shrub)}
+}
+function streetSign(x,z,label){
+ const pole=mat(0x46545a,.55,.35),panel=mat(0x263b45,.65,.2);
+ cylinder(scene,x,1.55,z,.055,.055,3.1,pole,8);
+ box(scene,x,2.72,z,.95,.48,.09,panel);
+ box(scene,x,2.72,z+.055,.82,.035,.025,mats.amber,false);
+}
+
 function tree(x,z,s=1){cylinder(scene,x,.9*s,z,.15*s,.23*s,1.8*s,mats.trunk);const crown=new THREE.Mesh(new THREE.IcosahedronGeometry(1.1*s,1),mats.leaf);crown.position.set(x,2*s,z);crown.castShadow=true;scene.add(crown)}
 function streetLamp(x,z){cylinder(scene,x,2.1,z,.07,.09,4.2,mat(0x343e42));box(scene,x+.55,4.1,z,.9,.08,.08,mat(0x343e42));const light=new THREE.PointLight(0xffd69a,.45,9);light.position.set(x+.9,3.9,z);scene.add(light)}
 function car(x,z,color){const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);box(g,0,.65,0,2.05,.65,4,mat(color,.45));box(g,0,1.15,-.2,1.65,.65,2.05,mats.glass);for(const wx of [-.86,.86])for(const wz of [-1.25,1.25]){const w=cylinder(g,wx,.38,wz,.36,.36,.18,mat(0x171c20),16);w.rotation.z=Math.PI/2}}
@@ -78,6 +101,19 @@ makeBuilding(-31,-6,14,18,23,mats.blue);makeBuilding(31,-6,14,18,20,mats.sand);
 makeBuilding(-31,22,14,16,13,mats.green);makeBuilding(31,22,14,16,18,mats.blue);
 for(const x of [-8,8])for(const z of [-42,-26,-10,7,24,41]){streetLamp(x,z)}
 for(const x of [-10,10])for(const z of [-38,-22,-4,14,34])tree(x,z,.9);
+for(const side of [-1,1]){
+ streetBench(side*8.75,-33,side<0?Math.PI/2:-Math.PI/2);
+ streetBench(side*8.75,3,side<0?Math.PI/2:-Math.PI/2);
+ streetBin(side*8.6,-17);streetBin(side*8.6,22);
+ planter(side*8.7,-44);planter(side*8.7,39);
+ streetSign(side*8.45,-5,side<0?'CIVIC':'EAST');
+}
+for(let i=0;i<7;i++){
+ const z=31+i*1.45;
+ box(scene,-5.2,.075,z,1.35,.025,.62,mats.roadline,false);
+ box(scene,5.2,.075,z,1.35,.025,.62,mats.roadline,false);
+}
+
 // Park-like community assembly plaza at the north end of the avenue.
 box(scene,0,.08,-48,21,.16,15,mats.concrete,false);
 box(scene,0,.18,-48,7,.08,5,mat(0x8b9d92),false);
@@ -214,6 +250,42 @@ function renderCareer(){
  const team=document.querySelector('#personnel-record');
  if(team)team.innerHTML=career.personnel.map(member=>{const level=1+Math.floor(member.xp/300);return '<article class="personnel-card"><b>'+member.name+'</b><span>'+rankForXp(member.xp)+'</span><span>LEVEL '+level+' · '+member.xp+' XP</span><span>FATIGUE '+member.fatigue+'% · MORALE '+member.morale+'%</span><div class="personnel-meter"><i style="width:'+member.morale+'%"></i></div><small>'+member.calls+' CALL-OUTS</small></article>'}).join('');
 }
+
+let audioContext=null,audioEnabled=false,ambientGain=null,footstepClock=0;
+function initAudio(){
+ if(audioEnabled)return;
+ const AudioCtx=window.AudioContext||window.webkitAudioContext;if(!AudioCtx)return;
+ audioContext=new AudioCtx();audioContext.resume();
+ const master=audioContext.createGain();master.gain.value=.16;master.connect(audioContext.destination);
+ const low=audioContext.createOscillator(),lowGain=audioContext.createGain();
+ low.type='sine';low.frequency.value=54;lowGain.gain.value=.12;low.connect(lowGain);lowGain.connect(master);low.start();
+ const mid=audioContext.createOscillator(),midGain=audioContext.createGain();
+ mid.type='triangle';mid.frequency.value=92;midGain.gain.value=.025;mid.connect(midGain);midGain.connect(master);mid.start();
+ ambientGain=master;audioEnabled=true;
+ const toggle=document.querySelector('#audio-toggle');if(toggle){toggle.textContent='AUDIO ON';toggle.setAttribute('aria-pressed','true')}
+}
+function setAudioEnabled(){
+ if(!audioEnabled){initAudio();return}
+ audioEnabled=false;if(ambientGain)ambientGain.gain.setTargetAtTime(0,audioContext.currentTime,.08);
+ const toggle=document.querySelector('#audio-toggle');if(toggle){toggle.textContent='AUDIO OFF';toggle.setAttribute('aria-pressed','false')}
+}
+function audioTone(freq,duration=.09,volume=.08,type='sine'){
+ if(!audioEnabled||!audioContext)return;
+ const osc=audioContext.createOscillator(),gain=audioContext.createGain();
+ osc.type=type;osc.frequency.setValueAtTime(freq,audioContext.currentTime);
+ gain.gain.setValueAtTime(volume,audioContext.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audioContext.currentTime+duration);
+ osc.connect(gain);gain.connect(audioContext.destination);osc.start();osc.stop(audioContext.currentTime+duration);
+}
+function playFootstep(){
+ if(!audioEnabled||!audioContext)return;
+ const osc=audioContext.createOscillator(),gain=audioContext.createGain(),filter=audioContext.createBiquadFilter();
+ osc.type='triangle';osc.frequency.setValueAtTime(78+Math.random()*18,audioContext.currentTime);
+ filter.type='lowpass';filter.frequency.value=170;
+ gain.gain.setValueAtTime(.055,audioContext.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audioContext.currentTime+.11);
+ osc.connect(filter);filter.connect(gain);gain.connect(audioContext.destination);osc.start();osc.stop(audioContext.currentTime+.12);
+}
+document.querySelector('#audio-toggle')?.addEventListener('click',setAudioEnabled);
+
 const keys={};const clock=new THREE.Clock();
 
 const interaction=document.querySelector('#interaction');
@@ -222,6 +294,7 @@ const briefing=document.querySelector('#briefing'),pauseScreen=document.querySel
 const dialogue=document.querySelector('#dialogue'),dialogueName=document.querySelector('#dialogue-name'),dialogueLine=document.querySelector('#dialogue-line');
 function toast(message){const el=document.querySelector('#toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1900)}
 function logRadio(message){
+ audioTone(880,.055,.045);audioTone(660,.08,.035);
  const stamp=document.querySelector('#clock')?.textContent||'08:42';
  radioEntries.push({time:stamp,message});
  updateHud();
@@ -258,6 +331,7 @@ function updateHud(){
 updateHud();
 applyScenarioContacts();
 function start(){
+ initAudio();
  if(!readPreparation()){toast('Complete the pre-deployment equipment check first.');return}
  started=true;inStation=true;paused=false;camera.position.set(0,1.72,-61.8);yaw=0;pitch=0;
  logRadio('DISPATCH: Response scenario confirmed — '+activeScenario.title+'.');
@@ -448,6 +522,7 @@ function update(dt,t){
  if(keys.KeyD||keys.ArrowRight)move.add(right);
  if(keys.KeyA||keys.ArrowLeft)move.sub(right);
  if(move.lengthSq()>0&&!dialogueOpen){
+  footstepClock+=dt;if(footstepClock>.42){playFootstep();footstepClock=0}
   move.normalize().multiplyScalar((keys.ShiftLeft||keys.ShiftRight?5.0:3.15)*dt);
   // Resolve movement per axis so the player cannot pass through parked vehicles.
   const nextX=camera.position.x+move.x,nextZ=camera.position.z+move.z;
@@ -462,7 +537,7 @@ function update(dt,t){
  }
  camera.position.x=THREE.MathUtils.clamp(camera.position.x,-6.1,6.1);
  camera.position.z=THREE.MathUtils.clamp(camera.position.z,-82,52);
- camera.position.y=1.72;
+ camera.position.y=1.72+(move.lengthSq()>0&&!dialogueOpen?Math.sin(t*11)*.025:0);
  camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;
  activeResident=dialogueOpen?null:nearestResident();
  if(activeResident){interaction.classList.add('visible');interactionText.textContent='TALK · '+activeResident.name.toUpperCase()}else interaction.classList.remove('visible');
