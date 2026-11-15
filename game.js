@@ -116,7 +116,11 @@ ring.rotation.x=-Math.PI/2;ring.position.set(0,.22,-48);scene.add(ring);
 const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,4,12),new THREE.MeshBasicMaterial({color:0x7bd0b0,transparent:true,opacity:.24}));beacon.position.set(0,2.1,-48);scene.add(beacon);
 const arrow=new THREE.Mesh(new THREE.ConeGeometry(.55,1.3,4),new THREE.MeshBasicMaterial({color:0xe7b65f}));arrow.rotation.x=Math.PI;arrow.position.set(0,4.4,-48);scene.add(arrow);
 
-const scenarios={power:{title:'CIVIC QUARTER EVACUATION',sector:'PUBLIC ASSISTANCE / SECTOR 04',lead:'A local power fault has disrupted the Civic Quarter. Several residents remain in the area. Coordinate safe assistance to the community plaza.',description:'A local power fault has disrupted the Civic Quarter. Confirm resident needs and coordinate safe assistance.',event1:{id:'power',title:'UTILITY STATUS / UPDATE 01',text:'Utility control reports that the power status is still unconfirmed. Keep public information accurate.'},event2:{id:'medical',title:'RESIDENT WELFARE / UPDATE 02',text:'Dispatch requests a welfare check for residents who may need additional assistance. Coordinate through the medical liaison.'}},weather:{title:'RIVERSIDE WEATHER RESPONSE',sector:'WEATHER SUPPORT / SECTOR 07',lead:'Severe weather is approaching the Riverside district. Check on residents and coordinate movement to the designated sheltered assembly point.',description:'Severe weather advisory. Prioritize clear updates, resident welfare and access to the sheltered assembly point.',event1:{id:'power',title:'WEATHER SERVICE / UPDATE 01',text:'Weather service has extended the advisory period. Conditions remain under review; do not announce an all-clear.'},event2:{id:'medical',title:'SHELTER ACCESS / UPDATE 02',text:'Dispatch requests confirmation that residents who need additional assistance can reach the sheltered assembly point.'}},transit:{title:'CENTRAL STATION SUPPORT',sector:'TRANSPORT SUPPORT / SECTOR 02',lead:'A transit disruption has affected Central Station. Help nearby residents understand the service update and reach the designated public assistance point.',description:'Transit services are disrupted. Provide verified information and coordinate support for people needing assistance.',event1:{id:'power',title:'TRANSIT CONTROL / UPDATE 01',text:'Transit control has not confirmed a restart time. Share only verified service information.'},event2:{id:'medical',title:'PUBLIC WELFARE / UPDATE 02',text:'Dispatch requests a welfare check for people who may need additional assistance near the station.'}}};
+const scenarios={
+ welfare:{title:'CIVIC QUARTER WELFARE CHECK',sector:'SPECIAL RESPONSE / SECTOR 04',lead:'Unit 04 is assigned to a residential welfare call in the Civic Quarter. Establish communications, identify the people involved, assess their needs and complete a documented, peaceful resolution.',description:'A resident welfare call. Speak with the people involved, verify information and arrange appropriate support.',event1:{id:'power',title:'DISPATCH / INFORMATION UPDATE 01',text:'Dispatch advises that the original caller information is incomplete. Confirm details directly and do not treat unverified information as fact.'},event2:{id:'medical',title:'WELFARE SUPPORT / UPDATE 02',text:'A person at the location may need additional assistance. Coordinate an appropriate welfare referral and record the outcome.'}},
+ missing:{title:'CIVIC QUARTER MISSING PERSON',sector:'SPECIAL RESPONSE / SECTOR 04',lead:'Unit 04 is assigned to a missing-person follow-up in the Civic Quarter. Gather reliable information from people at the location, check welfare concerns and coordinate a clear handover.',description:'A missing-person follow-up. Gather reliable accounts, identify welfare needs and coordinate information with dispatch.',event1:{id:'power',title:'DISPATCH / INFORMATION UPDATE 01',text:'Dispatch has received a new but unconfirmed sighting. Record it as unverified until corroborated.'},event2:{id:'medical',title:'WELFARE SUPPORT / UPDATE 02',text:'A person connected to the call may need support. Coordinate a welfare referral and document the handover.'}},
+ alarm:{title:'MARKET STREET ALARM CALL',sector:'SPECIAL RESPONSE / SECTOR 09',lead:'Unit 04 is assigned to a commercial alarm call on Market Street. Establish contact with the responsible parties, verify the available information and record a clear outcome.',description:'A commercial alarm call. Verify the report with responsible parties and preserve an accurate incident record.',event1:{id:'power',title:'DISPATCH / INFORMATION UPDATE 01',text:'The alarm provider cannot yet confirm the source of the alert. Keep the incident status pending verification.'},event2:{id:'medical',title:'SUPPORT REQUEST / UPDATE 02',text:'Dispatch advises that a staff member may require assistance. Coordinate a suitable support referral and record the result.'}}
+}
 let activeScenario=scenarios.power;
 const scenarioSelect=document.querySelector('#scenario-select');
 scenarioSelect?.addEventListener('change',()=>{activeScenario=scenarios[scenarioSelect.value]||scenarios.power;document.querySelector('#brief-lead').textContent=activeScenario.lead;document.querySelector('#scenario-description').textContent=activeScenario.description;document.querySelector('#mission-title').textContent=activeScenario.title;document.querySelector('#mission-subline').textContent=activeScenario.sector;});
@@ -134,13 +138,13 @@ function logRadio(message){
  updateHud();
 }
 function updateHud(){
- document.querySelector('#objective-count').innerHTML='Residents assisted <strong>'+assisted+' / 3</strong>';
+ document.querySelector('#objective-count').innerHTML='People contacted <strong>'+assisted+' / 3</strong>';
  document.querySelector('#progress-fill').style.width=(assisted/3*100)+'%';
  residents.forEach((r,i)=>{
   const status=document.querySelector('#resident-status-'+i);
   const row=document.querySelector('#resident-row-'+i);
   if(!status||!row)return;
-  const labels={waiting:'AWAITING CONTACT',escorting:'FOLLOWING YOU',safe:'AT ASSEMBLY'};
+  const labels={waiting:'NOT YET CONTACTED',escorting:'ACCOMPANIED',safe:'SAFE / CONTACT COMPLETE'};
   status.textContent=labels[r.state]||'UNKNOWN';
   row.dataset.state=r.state;
  });
@@ -194,7 +198,7 @@ function closeDialogue(){
 function chooseDialogue(choice){
  const r=selectedResident;if(!r||r.state!=='waiting')return;
  if(choice==='explain'){
-  r.informed=true;decisionScore+=1;supportActions++;dialogueLine.textContent='There is a reported power fault in this area. The community plaza is the designated meeting point, where staff can provide updates.';
+  r.informed=true;decisionScore+=1;supportActions++;dialogueLine.textContent='Unit 04 is following up on a call in this area. I can explain what is confirmed and what remains unknown.';
   toast('You explained the situation clearly.');
  }else if(choice==='needs'){
   r.needsDiscussed=true;decisionScore+=2;supportActions++;dialogueLine.textContent=r.need;
@@ -202,8 +206,8 @@ function chooseDialogue(choice){
  }else if(choice==='guide'){
   if(!radioReady){dialogueLine.textContent='Before we move, please establish radio contact with dispatch. Press R to complete the radio check.';toast('Dispatch contact required before escort.');return}
   if(!teamBriefed){dialogueLine.textContent='The response team has not been briefed yet. Assign team roles and issue the briefing from the command panel first.';toast('Team briefing required before escort.');return}
-  r.state='escorting';decisionScore+=1;supportActions++;logRadio('UNIT 04: '+r.name+' accepted voluntary accompaniment.');r.person.group.traverse(o=>{if(o.material?.color)o.material.color.set(0x79a995)});
-  dialogueLine.textContent='Thank you. I will walk with you to the community plaza.';
+  r.state='escorting';decisionScore+=1;supportActions++;logRadio('UNIT 04: '+r.name+' accepted voluntary assistance.');r.person.group.traverse(o=>{if(o.material?.color)o.material.color.set(0x79a995)});
+  dialogueLine.textContent='Thank you. I will accompany you to the designated safe location.';
   toast(r.name+' accepted your offer to accompany them.');
   dialogueOpen=false;dialogue.classList.add('hidden');selectedResident=null;activeResident=null;
   if(started&&!paused&&!complete)renderer.domElement.requestPointerLock?.();
@@ -258,10 +262,10 @@ function resolveDispatch(choice){
  if(!activeDispatch)return;
  const event=activeDispatch;
  if(event.id==='power'){
-  const message=choice==='verify'?'UNIT 04: Power status remains UNCONFIRMED. Information will not be presented as verified.':'UNIT 04: Requested a fresh status update from utility control.';
+  const message=choice==='verify'?'UNIT 04: Information remains UNCONFIRMED and will be recorded as such.':'UNIT 04: Requested a corroborating update from dispatch.';
   logRadio(message);decisionScore+=choice==='verify'?2:1;if(choice==='verify')verifiedInfo++;
  }else if(event.id==='medical'){
-  const message=choice==='assign'?'UNIT 04: Medical liaison assigned to coordinate a resident welfare check.':'UNIT 04: Welfare concern acknowledged. Continue monitoring and request support if needed.';
+  const message=choice==='assign'?'UNIT 04: Medical liaison assigned to coordinate the welfare referral.':'UNIT 04: Welfare concern acknowledged; support needs will be monitored.';
   logRadio(message);decisionScore+=choice==='assign'?2:1;if(choice==='assign'){const m=teamActivities.find(a=>a.role==='Medical liaison');if(m)m.status='WELFARE CHECK COORDINATED'}
  }
  dispatchResolved++;
