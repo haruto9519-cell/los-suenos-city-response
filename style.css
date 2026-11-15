@@ -110,3 +110,7 @@
 .location-tag{backdrop-filter:blur(8px)}
 #vignette{transition:background .3s ease}
 @media(max-width:700px){.topbar{padding:0 12px;height:56px}.top-status{display:none}.audio-toggle{padding:7px 8px;min-width:72px;font-size:8px}.clock{margin-left:auto;margin-right:10px}}
+
+#new-callout{width:100%;margin:12px 0 4px}
+.station-console .secondary-btn{border:1px solid rgba(220,174,97,.45);background:rgba(10,18,23,.85);color:#e2c58e;padding:12px 16px;letter-spacing:1.1px;font-weight:700;cursor:pointer}
+.station-console .secondary-btn:hover{background:rgba(220,174,97,.12)}
