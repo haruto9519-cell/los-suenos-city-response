@@ -9,7 +9,8 @@ A browser-based 3D police-life simulation prototype set in the fictional West Co
 - PC keyboard/mouse controls and touch controls for phones/tablets.
 - Start a day-watch shift, check in at roll call and collect the marked patrol vehicle.
 - Simplified patrol-car driving and vehicle entry/exit.
-- Thirteen pedestrians follow staggered sidewalk waypoint routes, turn at route ends and remain on the sidewalk corridors; conversation prompts remain available.
+- Thirteen pedestrians follow sidewalk routes and use daily home/work schedules based on occupation (shop staff, office workers, students, maintenance, delivery, cafe staff and residents).
+- Working NPCs commute to a workplace point and remain there during their shift, then return home outside their schedule; conversation openings and listening responses reflect each NPC's occupation.
 - Six ambient vehicles moving through the main roads.
 - Coordinated two-axis traffic lights with green, yellow and red phases; ambient cars stop at the intersection line when their direction is not permitted.
 - Dispatch sign-on, one routine neighborhood-assistance call, scene marker, arrival report and resident conversation.
