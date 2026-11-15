@@ -154,7 +154,7 @@ function logRadio(message){
  updateHud();
 }
 function updateHud(){
- document.querySelector('#objective-count').innerHTML='People contacted <strong>'+assisted+' / 3</strong>';
+ document.querySelector('#objective-count').innerHTML='Contacts documented <strong>'+assisted+' / 3</strong>';
  document.querySelector('#progress-fill').style.width=(assisted/3*100)+'%';
  residents.forEach((r,i)=>{
   const status=document.querySelector('#resident-status-'+i);
@@ -211,6 +211,18 @@ function closeDialogue(){
  dialogueOpen=false;dialogue.classList.add('hidden');selectedResident=null;
  if(started&&!paused&&!complete)renderer.domElement.requestPointerLock?.();
 }
+function closeIncident(){
+ if(complete||assisted<3||dispatchResolved<2)return;
+ complete=true;
+ const thoughtfulSupport=residents.filter(person=>person.informed&&person.needsDiscussed).length;
+ missionEndedAt=performance.now();
+ const rating=!radioReady?'COMMS INCOMPLETE':thoughtfulSupport===3&&decisionScore>=16?'EXCELLENT':thoughtfulSupport>=1?'COMMENDABLE':'COMPLETED';
+ const duration=Math.max(0,Math.round((missionEndedAt-missionStartedAt)/1000));
+ const mins=String(Math.floor(duration/60)).padStart(2,'0'),secs=String(duration%60).padStart(2,'0');
+ const report=document.querySelector('#report-details');
+ if(report)report.innerHTML='<div><span>MISSION TIME</span><b>'+mins+':'+secs+'</b></div><div><span>DECISION SCORE</span><b>'+decisionScore+'</b></div><div><span>DISPATCH UPDATES</span><b>'+dispatchResolved+'/2</b></div><div><span>VERIFIED INFORMATION</span><b>'+verifiedInfo+'</b></div><div><span>SUPPORT ACTIONS</span><b>'+supportActions+'</b></div><div><span>CONTACTS DOCUMENTED</span><b>'+assisted+'/3</b></div><div><span>PROTECTIVE EQUIPMENT</span><b>'+prepSelections.protection+'</b></div><div><span>COMMUNICATIONS</span><b>'+prepSelections.comms+'</b></div><div><span>SUPPORT KIT</span><b>'+prepSelections.support+'</b></div>';
+ setTimeout(()=>{completeScreen.classList.remove('hidden');document.exitPointerLock?.();document.querySelector('#final-count').textContent='03 / 03';document.querySelector('#final-rating').textContent=rating},800);
+}
 function chooseDialogue(choice){
  const r=selectedResident;if(!r||r.state!=='waiting')return;
  if(choice==='explain'){
@@ -219,13 +231,21 @@ function chooseDialogue(choice){
  }else if(choice==='needs'){
   r.needsDiscussed=true;decisionScore+=2;supportActions++;dialogueLine.textContent=r.need;
   toast('You listened to the resident.');
- }else if(choice==='guide'){
-  if(!radioReady){dialogueLine.textContent='Before we move, please establish radio contact with dispatch. Press R to complete the radio check.';toast('Dispatch contact required before escort.');return}
-  if(!teamBriefed){dialogueLine.textContent='The response team has not been briefed yet. Assign team roles and issue the briefing from the command panel first.';toast('Team briefing required before escort.');return}
-  r.state='escorting';decisionScore+=1;supportActions++;logRadio('UNIT 04: '+r.name+' accepted voluntary assistance.');r.person.group.traverse(o=>{if(o.material?.color)o.material.color.set(0x79a995)});
-  dialogueLine.textContent='Thank you. I will accompany you to the designated safe location.';
-  toast(r.name+' accepted your offer to accompany them.');
+ }else if(choice==='record'){
+  if(!r.informed||!r.needsDiscussed){
+   dialogueLine.textContent='Before closing this contact, explain what is confirmed and ask about the person’s needs. Record only information that has been established.';
+   toast('Complete the conversation before documenting it.');
+   return;
+  }
+  if(!radioReady){dialogueLine.textContent='Establish dispatch contact before closing the incident record. Press R to complete the radio check.';toast('Dispatch contact required.');return}
+  if(!teamBriefed){dialogueLine.textContent='Issue the unit briefing before closing this contact.';toast('Team briefing required.');return}
+  r.state='safe';assisted++;decisionScore+=2;supportActions++;
+  logRadio('UNIT 04: Contact documented for '+r.name+'. Information and support needs recorded; no further action requested at this time.');
+  r.person.group.traverse(o=>{if(o.material?.color)o.material.color.set(0x79a995)});
+  dialogueLine.textContent='Thank you. Your information and support needs have been recorded. The unit will include this contact in its incident report.';
+  toast(r.name+' — contact documented.');
   dialogueOpen=false;dialogue.classList.add('hidden');selectedResident=null;activeResident=null;
+  updateTeamActivities();updateHud();closeIncident();
   if(started&&!paused&&!complete)renderer.domElement.requestPointerLock?.();
  }
 }
@@ -289,6 +309,7 @@ function resolveDispatch(choice){
  updateTeamActivities();
  updateHud();
  toast('Dispatch update acknowledged.');
+ closeIncident();
  if(started&&!complete){paused=false;pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.()}
 }
 document.querySelector('#dispatch-choice-a')?.addEventListener('click',()=>resolveDispatch('verify'));
