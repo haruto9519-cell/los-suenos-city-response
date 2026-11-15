@@ -143,7 +143,6 @@ function applyScenarioContacts(){
   r.state='waiting';r.informed=false;r.needsDiscussed=false;
   const name=document.querySelector('#resident-name-'+i);
   if(name)name.textContent=contact.name.toUpperCase();
-  r.person.group.traverse(o=>{if(o.material?.color)o.material.color.set(0xffffff)});
  });
  updateHud();
 }
