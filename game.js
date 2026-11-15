@@ -606,7 +606,7 @@ function update(dt,t){
  const z=camera.position.z;document.querySelector('#location').textContent=z<-59&&z>-79?'CIVIC QUARTER / COMMUNITY RESPONSE CENTER':z<-38?'CIVIC QUARTER / COMMUNITY PLAZA':z<-15?'CIVIC QUARTER / NORTH AVENUE':z<8?'CIVIC QUARTER / EAST AVENUE':'CIVIC QUARTER / SOUTH AVENUE';
 }
 
-if(new URLSearchParams(location.search).has('e2e')){
+if((location.hostname==='127.0.0.1'||location.hostname==='localhost')&&new URLSearchParams(location.search).has('e2e')){
  window.__LOS_E2E__={
   state:()=>({started,inStation,paused,complete,assisted,dispatchResolved,radioReady,teamBriefed,scenario:activeScenarioKey,calls:career.calls,departmentFunds:career.departmentFunds}),
   openContact:(index)=>openDialogue(residents[index]),
