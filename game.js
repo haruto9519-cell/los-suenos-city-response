@@ -116,6 +116,10 @@ ring.rotation.x=-Math.PI/2;ring.position.set(0,.22,-48);scene.add(ring);
 const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,4,12),new THREE.MeshBasicMaterial({color:0x7bd0b0,transparent:true,opacity:.24}));beacon.position.set(0,2.1,-48);scene.add(beacon);
 const arrow=new THREE.Mesh(new THREE.ConeGeometry(.55,1.3,4),new THREE.MeshBasicMaterial({color:0xe7b65f}));arrow.rotation.x=Math.PI;arrow.position.set(0,4.4,-48);scene.add(arrow);
 
+const scenarios={power:{title:'CIVIC QUARTER EVACUATION',sector:'PUBLIC ASSISTANCE / SECTOR 04',lead:'A local power fault has disrupted the Civic Quarter. Several residents remain in the area. Coordinate safe assistance to the community plaza.',description:'A local power fault has disrupted the Civic Quarter. Confirm resident needs and coordinate safe assistance.',event1:{id:'power',title:'UTILITY STATUS / UPDATE 01',text:'Utility control reports that the power status is still unconfirmed. Keep public information accurate.'},event2:{id:'medical',title:'RESIDENT WELFARE / UPDATE 02',text:'Dispatch requests a welfare check for residents who may need additional assistance. Coordinate through the medical liaison.'}},weather:{title:'RIVERSIDE WEATHER RESPONSE',sector:'WEATHER SUPPORT / SECTOR 07',lead:'Severe weather is approaching the Riverside district. Check on residents and coordinate movement to the designated sheltered assembly point.',description:'Severe weather advisory. Prioritize clear updates, resident welfare and access to the sheltered assembly point.',event1:{id:'power',title:'WEATHER SERVICE / UPDATE 01',text:'Weather service has extended the advisory period. Conditions remain under review; do not announce an all-clear.'},event2:{id:'medical',title:'SHELTER ACCESS / UPDATE 02',text:'Dispatch requests confirmation that residents who need additional assistance can reach the sheltered assembly point.'}},transit:{title:'CENTRAL STATION SUPPORT',sector:'TRANSPORT SUPPORT / SECTOR 02',lead:'A transit disruption has affected Central Station. Help nearby residents understand the service update and reach the designated public assistance point.',description:'Transit services are disrupted. Provide verified information and coordinate support for people needing assistance.',event1:{id:'power',title:'TRANSIT CONTROL / UPDATE 01',text:'Transit control has not confirmed a restart time. Share only verified service information.'},event2:{id:'medical',title:'PUBLIC WELFARE / UPDATE 02',text:'Dispatch requests a welfare check for people who may need additional assistance near the station.'}}};
+let activeScenario=scenarios.power;
+const scenarioSelect=document.querySelector('#scenario-select');
+scenarioSelect?.addEventListener('change',()=>{activeScenario=scenarios[scenarioSelect.value]||scenarios.power;document.querySelector('#brief-lead').textContent=activeScenario.lead;document.querySelector('#scenario-description').textContent=activeScenario.description;document.querySelector('#mission-title').textContent=activeScenario.title;document.querySelector('#mission-subline').textContent=activeScenario.sector;});
 let yaw=0,pitch=0,started=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false,radioReady=false,teamBriefed=false,radioEntries=[],missionStartElapsed=0,dispatchEventOne=false,dispatchEventTwo=false,activeDispatch=null,dispatchResolved=0,teamAssignments=[],teamActivities=[],briefingTask='Resident support',missionStartedAt=0,missionEndedAt=0,decisionScore=0,verifiedInfo=0,supportActions=0;
 const keys={};const clock=new THREE.Clock();
 
@@ -159,7 +163,7 @@ function updateHud(){
  if(eventCount)eventCount.textContent='UPDATES RESOLVED: '+dispatchResolved+'/2';
 }
 updateHud();
-function start(){started=true;paused=false;missionStartedAt=performance.now();missionStartElapsed=clock.elapsedTime;briefing.classList.add('hidden');pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.();clock.getDelta()}
+function start(){started=true;paused=false;missionStartedAt=performance.now();missionStartElapsed=clock.elapsedTime;logRadio('DISPATCH: Response scenario confirmed — '+activeScenario.title+'.');briefing.classList.add('hidden');pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.();clock.getDelta()}
 document.querySelector('#start').addEventListener('click',start);
 document.querySelector('#resume').addEventListener('click',()=>{paused=false;pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.()});
 document.querySelector('#replay').addEventListener('click',()=>location.reload());
@@ -278,11 +282,11 @@ function update(dt,t){
  const missionSeconds=t-missionStartElapsed;
  if(radioReady&&teamBriefed&&!dispatchEventOne&&missionSeconds>=25&&!activeDispatch){
   dispatchEventOne=true;
-  raiseDispatchEvent({id:'power',title:'UTILITY STATUS / UPDATE 01',text:'Utility control reports that the power status is still unconfirmed. Keep public information accurate.'});
+  raiseDispatchEvent(activeScenario.event1);
  }
  if(radioReady&&teamBriefed&&dispatchEventOne&&!dispatchEventTwo&&missionSeconds>=65&&!activeDispatch){
   dispatchEventTwo=true;
-  raiseDispatchEvent({id:'medical',title:'RESIDENT WELFARE / UPDATE 02',text:'Dispatch requests a welfare check for residents who may need additional assistance. Coordinate through the medical liaison.'});
+  raiseDispatchEvent(activeScenario.event2);
  }
  const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
  const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
