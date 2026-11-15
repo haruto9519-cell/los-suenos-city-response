@@ -7,6 +7,8 @@ A browser-based 3D public-safety response game prototype. This original project 
 - Three.js 3D city block with roads, sidewalks, buildings, street furniture, vehicles and a civic assembly plaza.
 - First-person movement and mouse-look.
 - One guided public-assistance mission: approach three residents, offer assistance, and accompany them to the marked community assembly point.
+- Enterable community response center with a reception counter, public seating, windows and interior lighting.
+- Basic movement collision around parked vehicles and the response-center structure.
 - Mission HUD, progress tracking, pause/resume and completion screen.
 - Responsive interface; keyboard and mouse are currently the intended control scheme.
 
@@ -32,9 +34,9 @@ Serve this folder with any static web server. Because the game uses JavaScript E
 
 ## Roadmap
 
-1. Improve player collision and navigation boundaries.
-2. Add enterable interiors and richer environmental storytelling.
-3. Add civilian schedules, dialogue choices and branching assistance outcomes.
+1. Expand collision coverage to street furniture, building corners and NPC navigation.
+2. Add civilian schedules, dialogue choices and branching assistance outcomes.
+3. Add additional enterable buildings and richer environmental storytelling.
 4. Add additional districts, mission scenarios and persistent progression.
 5. Improve character animation, lighting, audio and performance.
 
