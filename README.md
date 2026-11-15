@@ -9,6 +9,7 @@ A browser-based 3D public-safety response game prototype. This original project 
 - One guided public-assistance mission: approach three residents, offer assistance, and accompany them to the marked community assembly point.
 - Enterable community response center with a reception counter, public seating, windows and interior lighting.
 - Basic movement collision around parked vehicles and the response-center structure.
+- Branching resident conversations: explain the situation, ask about individual needs, or offer to accompany each resident.
 - Mission HUD, progress tracking, pause/resume and completion screen.
 - Responsive interface; keyboard and mouse are currently the intended control scheme.
 
@@ -35,7 +36,7 @@ Serve this folder with any static web server. Because the game uses JavaScript E
 ## Roadmap
 
 1. Expand collision coverage to street furniture, building corners and NPC navigation.
-2. Add civilian schedules, dialogue choices and branching assistance outcomes.
+2. Add conversation memory and more varied assistance outcomes.
 3. Add additional enterable buildings and richer environmental storytelling.
 4. Add additional districts, mission scenarios and persistent progression.
 5. Improve character animation, lighting, audio and performance.
