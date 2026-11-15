@@ -24,3 +24,12 @@
 .resident-row[data-state="safe"] .resident-dot{background:#8fd0a7;box-shadow:0 0 8px #8fd0a788}
 .resident-row[data-state="safe"] b{color:#9ed7a9}
 @media(max-width:700px){.mission-panel{left:10px;top:76px;width:min(260px,calc(100vw - 20px));padding:13px}.resident-row{padding:5px 0}.roster-title{margin-bottom:6px}}
+
+/* Incident command / dispatch status */
+.command-net{padding:12px 0 10px;border-bottom:1px solid var(--line)}
+.command-state{display:flex;align-items:center;gap:8px;font-size:8px;letter-spacing:.7px;color:#d9b66e}
+.command-net p{font-size:8px;line-height:1.5;color:#9eacb1;margin:8px 0}
+.command-hint{font-size:8px;letter-spacing:1px;color:#8e9da3}
+.command-hint kbd{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-right:5px;border:1px solid #dcae6177;color:#f0c77e;background:#ffffff08;font:700 9px Inter,sans-serif}
+.command-state.ready{color:#8bd8cc}
+.command-state.ready .resident-dot{background:#77c9bd;box-shadow:0 0 8px #77c9bd88}
