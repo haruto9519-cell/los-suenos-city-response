@@ -49,6 +49,17 @@
   </aside>
 
   <div class="interaction" id="interaction"><span class="keycap">E</span><span id="interaction-text">OFFER ASSISTANCE</span></div>
+  <section id="dialogue" class="dialogue hidden" aria-live="polite">
+    <div class="dialogue-head"><span class="eyebrow">RESIDENT CONVERSATION</span><button id="dialogue-close" class="dialogue-close" aria-label="Close conversation">×</button></div>
+    <h3 id="dialogue-name">RESIDENT</h3>
+    <p id="dialogue-line">Hello. Can you tell me what's happening?</p>
+    <div class="dialogue-actions">
+      <button class="dialogue-choice" data-choice="explain">Explain the situation</button>
+      <button class="dialogue-choice" data-choice="needs">Ask what they need</button>
+      <button class="dialogue-choice primary-choice" data-choice="guide">Offer to accompany them</button>
+    </div>
+    <div class="dialogue-hint">Choose a response. You can ask questions before offering help.</div>
+  </section>
   <div class="center-reticle"><span></span></div>
   <div class="location-tag"><span class="location-pin">◆</span><span id="location">CIVIC QUARTER / EAST AVENUE</span></div>
   <div class="controls-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> MOVE <i>·</i> <kbd>SHIFT</kbd> WALK FASTER</div>
