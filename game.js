@@ -197,7 +197,7 @@ scenarioSelect?.addEventListener('change',()=>{activeScenarioKey=scenarioSelect.
 let yaw=0,pitch=0,started=false,inStation=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false,radioReady=false,teamBriefed=false,radioEntries=[],missionStartElapsed=0,dispatchEventOne=false,dispatchEventTwo=false,activeDispatch=null,dispatchResolved=0,teamAssignments=[],teamActivities=[],briefingTask='Resident support',missionStartedAt=0,missionEndedAt=0,decisionScore=0,verifiedInfo=0,supportActions=0;
 const careerStorageKey='losSuenosUnit04Career';
 function loadCareer(){
- const defaults={calls:0,experience:0,excellent:0,commendable:0,lastRating:'NO RECORD',lastScenario:'NONE',personnel:[
+ const defaults={calls:0,experience:0,excellent:0,commendable:0,lastRating:'NO RECORD',lastScenario:'NONE',departmentFunds:100000,personnel:[
   {name:'A. MORGAN',xp:0,fatigue:0,morale:75,calls:0},
   {name:'S. LEE',xp:0,fatigue:0,morale:75,calls:0},
   {name:'J. PATEL',xp:0,fatigue:0,morale:75,calls:0}
@@ -207,11 +207,12 @@ function loadCareer(){
 }
 const career=loadCareer();
 function saveCareer(){try{localStorage.setItem(careerStorageKey,JSON.stringify(career))}catch(e){toast('Career record could not be saved on this device.')}}
+function rankForXp(xp){if(xp>=1800)return 'SERGEANT';if(xp>=900)return 'CORPORAL';if(xp>=300)return 'SENIOR OFFICER';return 'OFFICER'}
 function renderCareer(){
  const el=document.querySelector('#career-record');
- if(el)el.innerHTML='<div><span>COMPLETED CALL-OUTS</span><b>'+career.calls+'</b></div><div><span>UNIT EXPERIENCE</span><b>'+career.experience+' XP</b></div><div><span>EXCELLENT REPORTS</span><b>'+career.excellent+'</b></div><div><span>COMMENDABLE REPORTS</span><b>'+career.commendable+'</b></div><div><span>LAST CALL-OUT</span><b>'+career.lastScenario+'</b></div><div><span>LAST RATING</span><b>'+career.lastRating+'</b></div>';
+ if(el)el.innerHTML='<div><span>DEPARTMENT FUNDS</span><b>$'+career.departmentFunds.toLocaleString('en-US')+'</b></div><div><span>COMPLETED CALL-OUTS</span><b>'+career.calls+'</b></div><div><span>UNIT EXPERIENCE</span><b>'+career.experience+' XP</b></div><div><span>EXCELLENT REPORTS</span><b>'+career.excellent+'</b></div><div><span>COMMENDABLE REPORTS</span><b>'+career.commendable+'</b></div><div><span>LAST CALL-OUT</span><b>'+career.lastScenario+'</b></div><div><span>LAST RATING</span><b>'+career.lastRating+'</b></div>';
  const team=document.querySelector('#personnel-record');
- if(team)team.innerHTML=career.personnel.map(member=>{const level=1+Math.floor(member.xp/300);return '<article class="personnel-card"><b>'+member.name+'</b><span>LEVEL '+level+' · '+member.xp+' XP</span><span>FATIGUE '+member.fatigue+'% · MORALE '+member.morale+'%</span><div class="personnel-meter"><i style="width:'+member.morale+'%"></i></div><small>'+member.calls+' CALL-OUTS</small></article>'}).join('');
+ if(team)team.innerHTML=career.personnel.map(member=>{const level=1+Math.floor(member.xp/300);return '<article class="personnel-card"><b>'+member.name+'</b><span>'+rankForXp(member.xp)+'</span><span>LEVEL '+level+' · '+member.xp+' XP</span><span>FATIGUE '+member.fatigue+'% · MORALE '+member.morale+'%</span><div class="personnel-meter"><i style="width:'+member.morale+'%"></i></div><small>'+member.calls+' CALL-OUTS</small></article>'}).join('');
 }
 const keys={};const clock=new THREE.Clock();
 
@@ -313,7 +314,11 @@ function closeIncident(){
  missionEndedAt=performance.now();
  const rating=!radioReady?'COMMS INCOMPLETE':thoughtfulSupport===3&&decisionScore>=16?'EXCELLENT':thoughtfulSupport>=1?'COMMENDABLE':'COMPLETED';
  const earned=rating==='EXCELLENT'?150:rating==='COMMENDABLE'?100:60;
- career.calls++;career.experience+=earned;if(rating==='EXCELLENT')career.excellent++;if(rating==='COMMENDABLE')career.commendable++;
+ career.calls++;career.experience+=earned;
+ const operatingCost=1800;
+ const performanceGrant=rating==='EXCELLENT'?5200:rating==='COMMENDABLE'?4000:2800;
+ career.departmentFunds=Math.max(0,career.departmentFunds-operatingCost)+performanceGrant;
+ if(rating==='EXCELLENT')career.excellent++;if(rating==='COMMENDABLE')career.commendable++;
  career.lastRating=rating;career.lastScenario=activeScenario.title;
  career.personnel.forEach((member,i)=>{
   const assigned=teamAssignments[i]||'Team coordination';
