@@ -605,6 +605,15 @@ function update(dt,t){
  document.querySelector('#clock').textContent=new Date(8*3600*1000+42*60000+Math.floor(t*1000)).toISOString().slice(11,19);
  const z=camera.position.z;document.querySelector('#location').textContent=z<-59&&z>-79?'CIVIC QUARTER / COMMUNITY RESPONSE CENTER':z<-38?'CIVIC QUARTER / COMMUNITY PLAZA':z<-15?'CIVIC QUARTER / NORTH AVENUE':z<8?'CIVIC QUARTER / EAST AVENUE':'CIVIC QUARTER / SOUTH AVENUE';
 }
+
+if(new URLSearchParams(location.search).has('e2e')){
+ window.__LOS_E2E__={
+  state:()=>({started,inStation,paused,complete,assisted,dispatchResolved,radioReady,teamBriefed,scenario:activeScenarioKey,calls:career.calls,departmentFunds:career.departmentFunds}),
+  openContact:(index)=>openDialogue(residents[index]),
+  advanceMission:(seconds)=>{missionStartElapsed=clock.elapsedTime-seconds;update(0,clock.elapsedTime)},
+  career:()=>JSON.parse(JSON.stringify(career))
+ };
+}
 function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04),t=clock.elapsedTime;if(started&&!paused&&!complete)update(dt,t);renderer.render(scene,camera)}
 animate();
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.8))});
