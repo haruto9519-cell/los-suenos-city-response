@@ -148,6 +148,35 @@ function applyScenarioContacts(){
 }
 applyScenarioContacts();
 
+
+/* 3D Unit 04 operations room and standing team roster. */
+const opsMat={panel:mat(0x17252d,.72),screen:mat(0x10232a,.38,.2),glow:mat(0x5f9b9a,.4,.15),desk:mat(0x38464a,.62),uniform:mat(0x263a45,.82),vest:mat(0x46575c,.8),patch:mat(0xd3ad68,.5,.2)};
+function makeUnitMember(x,z,name){
+ const p=makePerson(x,z,0x263a45,0x202a30,1.04);
+ box(p.group,0,1.25,.255,.43,.43,.075,opsMat.vest,false);
+ box(p.group,0,1.37,.3,.16,.09,.025,opsMat.patch,false);
+ box(p.group,-.29,1.42,.02,.12,.12,.12,opsMat.uniform,false);
+ box(p.group,.29,1.42,.02,.12,.12,.12,opsMat.uniform,false);
+ box(p.group,.19,1.12,.27,.11,.16,.09,opsMat.panel,false);
+ box(p.group,-.18,.88,.17,.42,.09,.12,opsMat.panel,false);
+ p.group.userData.unitName=name;
+ return p;
+}
+const unitMembers=[makeUnitMember(-3.05,-66.4,'A. MORGAN'),makeUnitMember(0,-66.9,'S. LEE'),makeUnitMember(3.05,-66.4,'J. PATEL')];
+for(const x of [-5.15,5.15]){
+ box(scene,x,1.05,-71.7,2.25,.18,2.1,opsMat.desk);
+ box(scene,x,1.7,-72.35,1.35,1.05,.12,opsMat.panel);
+ box(scene,x,1.72,-72.27,1.16,.82,.025,opsMat.screen,false);
+ box(scene,x,2.2,-72.25,1.45,.07,.1,opsMat.patch,false);
+ for(const dx of [-.82,.82])box(scene,x+dx,.48,-71.7,.09,.92,.09,opsMat.panel);
+}
+box(scene,0,4.65,-76.68,8.2,2.35,.16,opsMat.panel);
+box(scene,0,4.65,-76.57,7.88,2.05,.035,opsMat.screen,false);
+for(let i=0;i<4;i++){box(scene,-2.85+i*1.9,4.65,-76.52,1.48,1.58,.035,opsMat.glow,false);box(scene,-2.85+i*1.9,5.38,-76.48,1.1,.055,.025,opsMat.patch,false)}
+for(let i=0;i<5;i++)box(scene,-3.15+i*1.55,3.05,-76.54,1.18,.035,.025,opsMat.glow,false);
+const opsCeilingGlow=new THREE.PointLight(0x9abdc0,1.05,17);opsCeilingGlow.position.set(0,6.3,-69);scene.add(opsCeilingGlow);
+const opsWarmLight=new THREE.PointLight(0xe1b66f,.45,10);opsWarmLight.position.set(0,3.2,-74);scene.add(opsWarmLight);
+
 const prepSelections={protection:'Standard protective vest',comms:'Radio and earpiece',support:'First aid pouch'};
 function readPreparation(){
  prepSelections.protection=document.querySelector('#prep-protection')?.value||'Standard protective vest';
@@ -165,7 +194,7 @@ readPreparation();
 
 const scenarioSelect=document.querySelector('#scenario-select');
 scenarioSelect?.addEventListener('change',()=>{activeScenarioKey=scenarioSelect.value;activeScenario=scenarios[activeScenarioKey]||scenarios.welfare;applyScenarioContacts();document.querySelector('#brief-lead').textContent=activeScenario.lead;document.querySelector('#scenario-description').textContent=activeScenario.description;document.querySelector('#mission-title').textContent=activeScenario.title;document.querySelector('#mission-subline').textContent=activeScenario.sector;});
-let yaw=0,pitch=0,started=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false,radioReady=false,teamBriefed=false,radioEntries=[],missionStartElapsed=0,dispatchEventOne=false,dispatchEventTwo=false,activeDispatch=null,dispatchResolved=0,teamAssignments=[],teamActivities=[],briefingTask='Resident support',missionStartedAt=0,missionEndedAt=0,decisionScore=0,verifiedInfo=0,supportActions=0;
+let yaw=0,pitch=0,started=false,inStation=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false,radioReady=false,teamBriefed=false,radioEntries=[],missionStartElapsed=0,dispatchEventOne=false,dispatchEventTwo=false,activeDispatch=null,dispatchResolved=0,teamAssignments=[],teamActivities=[],briefingTask='Resident support',missionStartedAt=0,missionEndedAt=0,decisionScore=0,verifiedInfo=0,supportActions=0;
 const keys={};const clock=new THREE.Clock();
 
 const interaction=document.querySelector('#interaction');
@@ -209,8 +238,25 @@ function updateHud(){
 }
 updateHud();
 applyScenarioContacts();
-function start(){if(!readPreparation()){toast('Complete the pre-deployment equipment check first.');return}started=true;paused=false;missionStartedAt=performance.now();missionStartElapsed=clock.elapsedTime;logRadio('DISPATCH: Response scenario confirmed — '+activeScenario.title+'.');logRadio('UNIT 04: Pre-deployment check complete. Protective equipment: '+prepSelections.protection+'. Communications: '+prepSelections.comms+'. Support kit: '+prepSelections.support+'.');briefing.classList.add('hidden');pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.();clock.getDelta()}
+function start(){
+ if(!readPreparation()){toast('Complete the pre-deployment equipment check first.');return}
+ started=true;inStation=true;paused=false;camera.position.set(0,1.72,-61.8);yaw=0;pitch=0;
+ logRadio('DISPATCH: Response scenario confirmed — '+activeScenario.title+'.');
+ logRadio('UNIT 04: Pre-deployment check complete. Protective equipment: '+prepSelections.protection+'. Communications: '+prepSelections.comms+'. Support kit: '+prepSelections.support+'.');
+ briefing.classList.add('hidden');pauseScreen.classList.add('hidden');
+ document.querySelector('#station-console')?.classList.remove('hidden');
+ toast('Operations room active. Confirm team assignments before deployment.');
+}
 document.querySelector('#start').addEventListener('click',start);
+document.querySelector('#deploy-unit')?.addEventListener('click',()=>{
+ if(!teamBriefed){toast('Issue the team briefing before deployment.');return}
+ if(!readPreparation())return;
+ inStation=false;missionStartedAt=performance.now();missionStartElapsed=clock.elapsedTime;
+ camera.position.set(0,1.72,13);yaw=0;pitch=0;
+ document.querySelector('#station-console')?.classList.add('hidden');
+ logRadio('UNIT 04: Departing operations room. Call-out deployment confirmed.');
+ renderer.domElement.requestPointerLock?.();clock.getDelta();
+});
 document.querySelector('#resume').addEventListener('click',()=>{paused=false;pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.()});
 document.querySelector('#replay').addEventListener('click',()=>location.reload());
 document.addEventListener('pointerlockchange',()=>{if(started&&!complete&&!dialogueOpen&&document.pointerLockElement!==renderer.domElement&&!paused){paused=true;pauseScreen.classList.remove('hidden')}});
@@ -346,6 +392,7 @@ document.querySelector('#dispatch-choice-b')?.addEventListener('click',()=>{
 
 function nearestResident(){let nearest=null,dist=3.4;for(const r of residents){if(r.state!=='waiting')continue;const d=camera.position.distanceTo(r.person.group.position);if(d<dist){dist=d;nearest=r}}return nearest}
 function update(dt,t){
+ if(inStation){camera.position.y=1.72;camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;document.querySelector('#clock').textContent=new Date(8*3600*1000+42*60000+Math.floor(t*1000)).toISOString().slice(11,19);return}
  const missionSeconds=t-missionStartElapsed;
  if(radioReady&&teamBriefed&&!dispatchEventOne&&missionSeconds>=25&&!activeDispatch){
   dispatchEventOne=true;
