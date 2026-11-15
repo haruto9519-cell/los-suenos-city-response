@@ -6,7 +6,8 @@ A browser-based 3D public-safety response game prototype. This original project 
 
 - Three.js 3D city block with roads, sidewalks, buildings, street furniture and vehicles.
 - First-person movement and mouse-look.
-- Three documented civilian contacts: explain confirmed information, listen to individual needs, and close each contact with a recorded outcome.
+- Five distinct call-outs: residential welfare, missing-person follow-up, commercial alarm, transit-hub welfare and a public-space disagreement.
+- Fifteen named civilian contacts with scenario-specific accounts and support needs. Explain confirmed information, listen to individual needs, and close each contact with a recorded outcome.
 - Enterable civic response center with a reception counter, public seating, windows and interior lighting.
 - Basic movement collision around parked vehicles and the response-center structure.
 - Branching resident conversations: explain the situation, ask about individual needs, or offer to accompany each resident.
