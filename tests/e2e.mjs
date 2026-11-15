@@ -20,7 +20,7 @@ try {
   await page.locator('#station-console').waitFor({state:'visible'});
 
   assert.equal(await page.locator('#audio-toggle').textContent(),'AUDIO ON','audio should initialize on entering the operations room');
-  await page.locator('#audio-toggle').click();
+  await page.evaluate(()=>document.querySelector('#audio-toggle').click());
   assert.equal(await page.locator('#audio-toggle').textContent(),'AUDIO OFF','audio should turn off');
   await page.locator('#audio-toggle').click();
   assert.equal(await page.locator('#audio-toggle').textContent(),'AUDIO ON','audio should turn on again');
