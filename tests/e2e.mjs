@@ -15,7 +15,7 @@ try{
  await page.evaluate(()=>window.__SANVEGA_E2E__.setPosition(-15,11));await page.evaluate(()=>window.__SANVEGA_E2E__.interact());
  assert.equal((await page.evaluate(()=>window.__SANVEGA_E2E__.state())).inVehicle,true);
  await page.evaluate(()=>window.__SANVEGA_E2E__.acceptDispatch());assert.equal((await page.evaluate(()=>window.__SANVEGA_E2E__.state())).dispatch,true);
- await page.evaluate(()=>window.__SANVEGA_E2E__.setPosition(31,-28));await page.evaluate(()=>window.__SANVEGA_E2E__.interact());await page.evaluate(()=>window.__SANVEGA_E2E__.interact());
+ await page.evaluate(()=>window.__SANVEGA_E2E__.interact());await page.evaluate(()=>window.__SANVEGA_E2E__.setPosition(31,-28));await page.evaluate(()=>window.__SANVEGA_E2E__.interact());
  assert.equal((await page.evaluate(()=>window.__SANVEGA_E2E__.state())).atScene,true);
  await page.evaluate(()=>window.__SANVEGA_E2E__.setPosition(31,-23));await page.evaluate(()=>window.__SANVEGA_E2E__.interact());
  assert.equal(await page.locator('#dialogue').isVisible(),true);
