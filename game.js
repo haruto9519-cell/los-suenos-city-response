@@ -267,13 +267,17 @@ let audioContext=null,audioEnabled=false,ambientGain=null,footstepClock=0;
 function initAudio(){
  if(audioEnabled)return;
  const AudioCtx=window.AudioContext||window.webkitAudioContext;if(!AudioCtx)return;
- audioContext=new AudioCtx();audioContext.resume();
- const master=audioContext.createGain();master.gain.value=.16;master.connect(audioContext.destination);
- const low=audioContext.createOscillator(),lowGain=audioContext.createGain();
- low.type='sine';low.frequency.value=54;lowGain.gain.value=.12;low.connect(lowGain);lowGain.connect(master);low.start();
- const mid=audioContext.createOscillator(),midGain=audioContext.createGain();
- mid.type='triangle';mid.frequency.value=92;midGain.gain.value=.025;mid.connect(midGain);midGain.connect(master);mid.start();
- ambientGain=master;audioEnabled=true;
+ if(!audioContext){
+  audioContext=new AudioCtx();
+  const master=audioContext.createGain();master.gain.value=.16;master.connect(audioContext.destination);ambientGain=master;
+  const low=audioContext.createOscillator(),lowGain=audioContext.createGain();
+  low.type='sine';low.frequency.value=54;lowGain.gain.value=.12;low.connect(lowGain);lowGain.connect(master);low.start();
+  const mid=audioContext.createOscillator(),midGain=audioContext.createGain();
+  mid.type='triangle';mid.frequency.value=92;midGain.gain.value=.025;mid.connect(midGain);midGain.connect(master);mid.start();
+ }
+ audioContext.resume();
+ if(ambientGain)ambientGain.gain.setTargetAtTime(.16,audioContext.currentTime,.08);
+ audioEnabled=true;
  const toggle=document.querySelector('#audio-toggle');if(toggle){toggle.textContent='AUDIO ON';toggle.setAttribute('aria-pressed','true')}
 }
 function setAudioEnabled(){
@@ -353,12 +357,49 @@ function start(){
  toast('Operations room active. Confirm team assignments before deployment.');
 }
 document.querySelector('#start').addEventListener('click',start);
+function resetCallout(){
+ assisted=0;activeResident=null;selectedResident=null;dialogueOpen=false;radioReady=false;teamBriefed=false;
+ radioEntries=[];missionStartElapsed=0;dispatchEventOne=false;dispatchEventTwo=false;activeDispatch=null;
+ dispatchResolved=0;teamAssignments=[];teamActivities=[];briefingTask='Resident support';
+ missionStartedAt=0;missionEndedAt=0;decisionScore=0;verifiedInfo=0;supportActions=0;
+ complete=false;paused=false;inStation=true;
+ residents.forEach(r=>{r.state='waiting';r.informed=false;r.needsDiscussed=false});
+ document.querySelector('#dialogue')?.classList.add('hidden');
+ document.querySelector('#dispatch-event')?.classList.add('hidden');
+ document.querySelector('#dispatch-count').textContent='UPDATES RESOLVED: 0/2';
+ document.querySelector('#team-state').textContent='BRIEFING REQUIRED';
+ document.querySelector('#team-activity').innerHTML='<div class="radio-entry muted">AWAITING TEAM BRIEFING</div>';
+ document.querySelector('#radio-transcript').innerHTML='<div class="radio-entry muted">NO TRAFFIC LOGGED</div>';
+ document.querySelector('#radio-state').textContent='AWAITING RADIO CHECK';
+ document.querySelector('#radio-log').textContent='NO OUTBOUND REPORT RECORDED';
+ document.querySelector('#progress-fill').style.width='0%';
+ document.querySelector('#objective-count').innerHTML='Contacts documented <strong>0 / 3</strong>';
+ document.querySelector('#debrief-summary')?.classList.add('hidden');
+ document.querySelector('#station-console')?.classList.add('hidden');
+ document.querySelector('#briefing')?.classList.remove('hidden');
+ const order=document.querySelector('#team-order');if(order)order.selectedIndex=0;
+ document.querySelectorAll('.team-role').forEach((el,i)=>{el.selectedIndex=i});
+ document.querySelector('#mission-title').textContent=activeScenario.title;
+ document.querySelector('#mission-subline').textContent=activeScenario.sector;
+ document.querySelector('#brief-lead').textContent=activeScenario.lead;
+ document.querySelector('#scenario-description').textContent=activeScenario.description;
+ applyScenarioContacts();updateHud();
+ camera.position.set(0,1.72,-61.8);yaw=0;pitch=0;
+ logRadio('UNIT 04: New call-out selected. Awaiting preparation and team briefing.');
+}
+document.querySelector('#new-callout')?.addEventListener('click',()=>{
+ if(!inStation||!complete){toast('Return to the operations room before selecting another call-out.');return}
+ resetCallout();
+});
+
 document.querySelector('#return-station')?.addEventListener('click',()=>{
+ if(!complete)return;
  completeScreen.classList.add('hidden');inStation=true;paused=false;camera.position.set(0,1.72,-61.8);yaw=0;pitch=0;
  document.querySelector('#station-console')?.classList.remove('hidden');document.querySelector('#debrief-summary')?.classList.remove('hidden');
  career.personnel.forEach(member=>{member.fatigue=Math.max(0,member.fatigue-12);member.morale=Math.min(100,member.morale+2)});saveCareer();renderCareer();logRadio('UNIT 04: Returned to operations room. Post-call debrief is available.');toast('Back at the station. Review the unit career record.');
 });
 document.querySelector('#deploy-unit')?.addEventListener('click',()=>{
+ if(complete){toast('Select a new call-out before redeploying.');return}
  if(!teamBriefed){toast('Issue the team briefing before deployment.');return}
  if(!readPreparation())return;
  inStation=false;missionStartedAt=performance.now();missionStartElapsed=clock.elapsedTime;
@@ -437,7 +478,6 @@ function chooseDialogue(choice){
   if(!teamBriefed){dialogueLine.textContent='Issue the unit briefing before closing this contact.';toast('Team briefing required.');return}
   r.state='safe';assisted++;decisionScore+=2;supportActions++;
   logRadio('UNIT 04: Contact documented for '+r.name+'. Information and support needs recorded; no further action requested at this time.');
-  r.person.group.traverse(o=>{if(o.material?.color)o.material.color.set(0x79a995)});
   dialogueLine.textContent='Thank you. Your information and support needs have been recorded. The unit will include this contact in its incident report.';
   toast(r.name+' — contact documented.');
   dialogueOpen=false;dialogue.classList.add('hidden');selectedResident=null;activeResident=null;
