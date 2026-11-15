@@ -137,7 +137,7 @@ function updateHud(){
  });
  const radioState=document.querySelector('#radio-state');
  const radioLog=document.querySelector('#radio-log');
- if(radioState)radioState.textContent=radioReady?'LINK ESTABLISHED':'AWAITING RADIO CHECK';
+ if(radioState){radioState.textContent=radioReady?'LINK ESTABLISHED':'AWAITING RADIO CHECK';radioState.classList.toggle('ready',radioReady)}
  if(radioLog)radioLog.textContent=radioReady?'UNIT 04: ON SCENE. REQUESTING INCIDENT UPDATE.':'NO OUTBOUND REPORT RECORDED';
 }
 updateHud();
