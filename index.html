@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#101820">
+  <title>LOS SUENOS: CITY RESPONSE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div id="game"></div>
+  <div id="vignette"></div>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">LS</span><span>LOS SUENOS <small>CITY RESPONSE</small></span></div>
+    <div class="top-status"><span class="live-dot"></span> CITY OPERATIONS <b>●</b> TRAINING SECTOR 04</div>
+    <div class="clock" id="clock">08:42:16</div>
+  </header>
+
+  <section id="briefing" class="overlay">
+    <div class="brief-card">
+      <div class="eyebrow">LOS SUENOS MUNICIPAL RESPONSE SERVICE <span>•</span> SIMULATION 01</div>
+      <h1>FIRST<br><em>RESPONSE</em></h1>
+      <p class="brief-lead">A power fault has disrupted part of the Civic Quarter. Several residents remain in the area. Coordinate a calm, orderly evacuation to the marked assembly point.</p>
+      <div class="brief-grid">
+        <div><small>SECTOR</small><strong>CIVIC QUARTER</strong></div>
+        <div><small>PRIORITY</small><strong class="amber">PUBLIC SAFETY</strong></div>
+        <div><small>OBJECTIVE</small><strong>GUIDE 3 RESIDENTS</strong></div>
+      </div>
+      <div class="brief-note"><span>MISSION PARAMETERS</span><p>Keep residents informed. Approach each person and offer assistance. Follow the route markers to the assembly area.</p></div>
+      <button id="start" class="primary-btn">BEGIN RESPONSE <span>→</span></button>
+      <div class="brief-foot">WASD MOVE <i>·</i> MOUSE LOOK <i>·</i> E INTERACT <i>·</i> ESC PAUSE</div>
+    </div>
+  </section>
+
+  <section id="pause" class="overlay hidden">
+    <div class="pause-card"><div class="eyebrow">OPERATIONS PAUSED</div><h2>TAKE A MOMENT.</h2><p>Response activity is on hold.</p><button id="resume" class="primary-btn">RESUME <span>→</span></button></div>
+  </section>
+
+  <aside class="mission-panel">
+    <div class="panel-head"><span>ACTIVE RESPONSE</span><span class="status-pill">IN PROGRESS</span></div>
+    <h2>CIVIC QUARTER<br>EVACUATION</h2>
+    <p class="subline">PUBLIC ASSISTANCE / SECTOR 04</p>
+    <div class="objective"><div class="objective-icon">◎</div><div><b>Guide residents to safety</b><small id="objective-count">Residents assisted <strong>0 / 3</strong></small></div></div>
+    <div class="progress-track"><div id="progress-fill"></div></div>
+    <div class="panel-bottom"><span>ASSEMBLY POINT</span><b>COMMUNITY PLAZA</b></div>
+  </aside>
+
+  <div class="interaction" id="interaction"><span class="keycap">E</span><span id="interaction-text">OFFER ASSISTANCE</span></div>
+  <div class="center-reticle"><span></span></div>
+  <div class="location-tag"><span class="location-pin">◆</span><span id="location">CIVIC QUARTER / EAST AVENUE</span></div>
+  <div class="controls-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> MOVE <i>·</i> <kbd>SHIFT</kbd> WALK FASTER</div>
+
+  <section id="complete" class="overlay hidden">
+    <div class="complete-card">
+      <div class="success-icon">✓</div><div class="eyebrow">RESPONSE COMPLETE</div>
+      <h2>COMMUNITY<br><em>SAFE.</em></h2>
+      <p>All residents have reached the assembly point. Your calm coordination helped the Civic Quarter respond safely.</p>
+      <div class="score-row"><span>RESIDENTS ASSISTED</span><b id="final-count">03 / 03</b></div>
+      <div class="score-row"><span>RESPONSE RATING</span><b class="amber">COMMENDABLE</b></div>
+      <button id="replay" class="primary-btn">REPLAY SIMULATION <span>↻</span></button>
+    </div>
+  </section>
+  <div id="toast" class="toast"></div>
+  <script type="module" src="./game.js"></script>
+</body>
+</html>
