@@ -214,6 +214,7 @@ function updateHud(){
  if(eventCount)eventCount.textContent='UPDATES RESOLVED: '+dispatchResolved+'/2';
 }
 updateHud();
+applyScenarioContacts();
 function start(){if(!readPreparation()){toast('Complete the pre-deployment equipment check first.');return}started=true;paused=false;missionStartedAt=performance.now();missionStartElapsed=clock.elapsedTime;logRadio('DISPATCH: Response scenario confirmed — '+activeScenario.title+'.');logRadio('UNIT 04: Pre-deployment check complete. Protective equipment: '+prepSelections.protection+'. Communications: '+prepSelections.comms+'. Support kit: '+prepSelections.support+'.');briefing.classList.add('hidden');pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.();clock.getDelta()}
 document.querySelector('#start').addEventListener('click',start);
 document.querySelector('#resume').addEventListener('click',()=>{paused=false;pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.()});
