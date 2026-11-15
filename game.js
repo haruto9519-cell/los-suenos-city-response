@@ -85,7 +85,7 @@ for(const x of [-8,8])for(const z of [-52,-44])tree(x,z,.85);
 box(scene,0,1.2,-54,7,2.3,.25,mats.dark);
 box(scene,0,2.5,-54,7,.12,.4,mats.amber);
 const signText=makePerson(0,0,0xffffff,0xffffff,.01);scene.remove(signText.group);
-car(-4,5,0x52656a);car(4,-26,0x8a8172);
+const cars=[{x:-4,z:5},{x:4,z:-26}];car(-4,5,0x52656a);car(4,-26,0x8a8172);
 // Resident characters are distinct and visibly identifiable.
 const residents=[
  {person:makePerson(-3.7,-5,0x9a715b,0x303d49),state:'waiting',name:'Resident A'},
@@ -125,8 +125,15 @@ function update(dt,t){
  if(keys.KeyS||keys.ArrowDown)move.sub(forward);
  if(keys.KeyD||keys.ArrowRight)move.add(right);
  if(keys.KeyA||keys.ArrowLeft)move.sub(right);
- if(move.lengthSq()>0){move.normalize().multiplyScalar((keys.ShiftLeft||keys.ShiftRight?5.0:3.15)*dt);camera.position.add(move)}
- camera.position.x=THREE.MathUtils.clamp(camera.position.x,-7.2,7.2);
+ if(move.lengthSq()>0){
+  move.normalize().multiplyScalar((keys.ShiftLeft||keys.ShiftRight?5.0:3.15)*dt);
+  // Resolve movement per axis so the player cannot pass through parked vehicles.
+  const nextX=camera.position.x+move.x,nextZ=camera.position.z+move.z;
+  const blocked=(x,z)=>cars.some(c=>Math.abs(x-c.x)<1.35&&Math.abs(z-c.z)<2.35);
+  if(!blocked(nextX,camera.position.z))camera.position.x=nextX;
+  if(!blocked(camera.position.x,nextZ))camera.position.z=nextZ;
+ }
+ camera.position.x=THREE.MathUtils.clamp(camera.position.x,-5.45,5.45);
  camera.position.z=THREE.MathUtils.clamp(camera.position.z,-56,52);
  camera.position.y=1.72;
  camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;
