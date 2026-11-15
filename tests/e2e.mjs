@@ -56,6 +56,12 @@ try {
   await page.locator('#dispatch-event').waitFor({state:'visible'});
   assert.match(await page.locator('#dispatch-choice-a').textContent(),/passenger support liaison/i);
   await page.evaluate(()=>document.querySelector('#dispatch-choice-a').click());
+  await page.waitForTimeout(1000);
+  const finalState=await page.evaluate(()=>window.__LOS_E2E__.state());
+  console.log('STATE AFTER FINAL DISPATCH',JSON.stringify(finalState));
+  assert.equal(finalState.dispatchResolved,2,'both dispatch updates should be resolved');
+  assert.equal(finalState.assisted,3,'all three contacts should remain documented');
+  assert.equal(finalState.complete,true,'incident should close after all objectives');
   await page.locator('#complete').waitFor({state:'visible',timeout:5000});
   const completed=await page.evaluate(()=>window.__LOS_E2E__.state());
   assert.equal(completed.complete,true);
