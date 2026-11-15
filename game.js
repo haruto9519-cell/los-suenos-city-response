@@ -116,7 +116,7 @@ ring.rotation.x=-Math.PI/2;ring.position.set(0,.22,-48);scene.add(ring);
 const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,4,12),new THREE.MeshBasicMaterial({color:0x7bd0b0,transparent:true,opacity:.24}));beacon.position.set(0,2.1,-48);scene.add(beacon);
 const arrow=new THREE.Mesh(new THREE.ConeGeometry(.55,1.3,4),new THREE.MeshBasicMaterial({color:0xe7b65f}));arrow.rotation.x=Math.PI;arrow.position.set(0,4.4,-48);scene.add(arrow);
 
-let yaw=0,pitch=0,started=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false,radioReady=false,teamBriefed=false,radioEntries=[];
+let yaw=0,pitch=0,started=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false,radioReady=false,teamBriefed=false,radioEntries=[],missionStartElapsed=0,dispatchEventOne=false,dispatchEventTwo=false,activeDispatch=null,dispatchResolved=0;
 const keys={};const clock=new THREE.Clock();
 
 const interaction=document.querySelector('#interaction');
@@ -147,10 +147,17 @@ function updateHud(){
  const teamState=document.querySelector('#team-state');
  if(teamState){teamState.textContent=teamBriefed?'TEAM BRIEFED':'BRIEFING REQUIRED';teamState.classList.toggle('ready',teamBriefed)}
  const log=document.querySelector('#radio-transcript');
- if(log)log.innerHTML=radioEntries.slice(-4).map(entry=>'<div class="radio-entry"><span>'+entry.time+'</span> '+entry.message+'</div>').join('')||'<div class="radio-entry muted">NO TRAFFIC LOGGED</div>';
+ if(log)log.innerHTML=radioEntries.slice(-5).map(entry=>'<div class="radio-entry"><span>'+entry.time+'</span> '+entry.message+'</div>').join('')||'<div class="radio-entry muted">NO TRAFFIC LOGGED</div>';
+ const eventPanel=document.querySelector('#dispatch-event');
+ if(eventPanel)eventPanel.classList.toggle('hidden',!activeDispatch);
+ const eventTitle=document.querySelector('#dispatch-event-title');
+ const eventText=document.querySelector('#dispatch-event-text');
+ if(activeDispatch&&eventTitle&&eventText){eventTitle.textContent=activeDispatch.title;eventText.textContent=activeDispatch.text}
+ const eventCount=document.querySelector('#dispatch-count');
+ if(eventCount)eventCount.textContent='UPDATES RESOLVED: '+dispatchResolved+'/2';
 }
 updateHud();
-function start(){started=true;paused=false;briefing.classList.add('hidden');pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.();clock.getDelta()}
+function start(){started=true;paused=false;missionStartElapsed=clock.elapsedTime;briefing.classList.add('hidden');pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.();clock.getDelta()}
 document.querySelector('#start').addEventListener('click',start);
 document.querySelector('#resume').addEventListener('click',()=>{paused=false;pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.()});
 document.querySelector('#replay').addEventListener('click',()=>location.reload());
@@ -210,8 +217,47 @@ if(briefButton)briefButton.addEventListener('click',()=>{
  toast('Team briefing issued. Responsibilities recorded.');
 });
 
+
+function raiseDispatchEvent(event){
+ if(activeDispatch||complete)return;
+ activeDispatch=event;
+ logRadio('DISPATCH: '+event.title+' — '+event.text);
+ updateHud();
+ toast('New dispatch update received.');
+}
+function resolveDispatch(choice){
+ if(!activeDispatch)return;
+ const event=activeDispatch;
+ if(event.id==='power'){
+  const message=choice==='verify'?'UNIT 04: Power status remains UNCONFIRMED. Information will not be presented as verified.':'UNIT 04: Requested a fresh status update from utility control.';
+  logRadio(message);
+ }else if(event.id==='medical'){
+  const message=choice==='assign'?'UNIT 04: Medical liaison assigned to coordinate a resident welfare check.':'UNIT 04: Welfare concern acknowledged. Continue monitoring and request support if needed.';
+  logRadio(message);
+ }
+ dispatchResolved++;
+ activeDispatch=null;
+ updateHud();
+ toast('Dispatch update acknowledged.');
+ if(started&&!complete){paused=false;pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.()}
+}
+document.querySelector('#dispatch-choice-a')?.addEventListener('click',()=>resolveDispatch('verify'));
+document.querySelector('#dispatch-choice-b')?.addEventListener('click',()=>{
+ const id=activeDispatch?.id;
+ resolveDispatch(id==='medical'?'assign':'request');
+});
+
 function nearestResident(){let nearest=null,dist=3.4;for(const r of residents){if(r.state!=='waiting')continue;const d=camera.position.distanceTo(r.person.group.position);if(d<dist){dist=d;nearest=r}}return nearest}
 function update(dt,t){
+ const missionSeconds=t-missionStartElapsed;
+ if(radioReady&&teamBriefed&&!dispatchEventOne&&missionSeconds>=25&&!activeDispatch){
+  dispatchEventOne=true;
+  raiseDispatchEvent({id:'power',title:'UTILITY STATUS / UPDATE 01',text:'Utility control reports that the power status is still unconfirmed. Keep public information accurate.'});
+ }
+ if(radioReady&&teamBriefed&&dispatchEventOne&&!dispatchEventTwo&&missionSeconds>=65&&!activeDispatch){
+  dispatchEventTwo=true;
+  raiseDispatchEvent({id:'medical',title:'RESIDENT WELFARE / UPDATE 02',text:'Dispatch requests a welfare check for residents who may need additional assistance. Coordinate through the medical liaison.'});
+ }
  const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
  const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
  const move=new THREE.Vector3();
