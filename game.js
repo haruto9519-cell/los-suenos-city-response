@@ -116,7 +116,7 @@ ring.rotation.x=-Math.PI/2;ring.position.set(0,.22,-48);scene.add(ring);
 const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,4,12),new THREE.MeshBasicMaterial({color:0x7bd0b0,transparent:true,opacity:.24}));beacon.position.set(0,2.1,-48);scene.add(beacon);
 const arrow=new THREE.Mesh(new THREE.ConeGeometry(.55,1.3,4),new THREE.MeshBasicMaterial({color:0xe7b65f}));arrow.rotation.x=Math.PI;arrow.position.set(0,4.4,-48);scene.add(arrow);
 
-let yaw=0,pitch=0,started=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false,radioReady=false,teamBriefed=false,radioEntries=[],missionStartElapsed=0,dispatchEventOne=false,dispatchEventTwo=false,activeDispatch=null,dispatchResolved=0;
+let yaw=0,pitch=0,started=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false,radioReady=false,teamBriefed=false,radioEntries=[],missionStartElapsed=0,dispatchEventOne=false,dispatchEventTwo=false,activeDispatch=null,dispatchResolved=0,teamAssignments=[],teamActivities=[],briefingTask='Resident support',missionStartedAt=0,missionEndedAt=0,decisionScore=0,verifiedInfo=0,supportActions=0;
 const keys={};const clock=new THREE.Clock();
 
 const interaction=document.querySelector('#interaction');
@@ -146,6 +146,8 @@ function updateHud(){
  if(radioLog)radioLog.textContent=radioReady?'UNIT 04: ON SCENE. DISPATCH CHANNEL OPEN.':'NO OUTBOUND REPORT RECORDED';
  const teamState=document.querySelector('#team-state');
  if(teamState){teamState.textContent=teamBriefed?'TEAM BRIEFED':'BRIEFING REQUIRED';teamState.classList.toggle('ready',teamBriefed)}
+ const activity=document.querySelector('#team-activity');
+ if(activity)activity.innerHTML=teamActivities.map((a,i)=>'<div class="team-activity-row"><b>'+a.name+'</b><span>'+a.status+'</span></div>').join('')||'<div class="radio-entry muted">AWAITING TEAM BRIEFING</div>';
  const log=document.querySelector('#radio-transcript');
  if(log)log.innerHTML=radioEntries.slice(-5).map(entry=>'<div class="radio-entry"><span>'+entry.time+'</span> '+entry.message+'</div>').join('')||'<div class="radio-entry muted">NO TRAFFIC LOGGED</div>';
  const eventPanel=document.querySelector('#dispatch-event');
@@ -157,7 +159,7 @@ function updateHud(){
  if(eventCount)eventCount.textContent='UPDATES RESOLVED: '+dispatchResolved+'/2';
 }
 updateHud();
-function start(){started=true;paused=false;missionStartElapsed=clock.elapsedTime;briefing.classList.add('hidden');pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.();clock.getDelta()}
+function start(){started=true;paused=false;missionStartedAt=performance.now();missionStartElapsed=clock.elapsedTime;briefing.classList.add('hidden');pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.();clock.getDelta()}
 document.querySelector('#start').addEventListener('click',start);
 document.querySelector('#resume').addEventListener('click',()=>{paused=false;pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.()});
 document.querySelector('#replay').addEventListener('click',()=>location.reload());
@@ -188,15 +190,15 @@ function closeDialogue(){
 function chooseDialogue(choice){
  const r=selectedResident;if(!r||r.state!=='waiting')return;
  if(choice==='explain'){
-  r.informed=true;dialogueLine.textContent='There is a reported power fault in this area. The community plaza is the designated meeting point, where staff can provide updates.';
+  r.informed=true;decisionScore+=1;supportActions++;dialogueLine.textContent='There is a reported power fault in this area. The community plaza is the designated meeting point, where staff can provide updates.';
   toast('You explained the situation clearly.');
  }else if(choice==='needs'){
-  r.needsDiscussed=true;dialogueLine.textContent=r.need;
+  r.needsDiscussed=true;decisionScore+=2;supportActions++;dialogueLine.textContent=r.need;
   toast('You listened to the resident.');
  }else if(choice==='guide'){
   if(!radioReady){dialogueLine.textContent='Before we move, please establish radio contact with dispatch. Press R to complete the radio check.';toast('Dispatch contact required before escort.');return}
   if(!teamBriefed){dialogueLine.textContent='The response team has not been briefed yet. Assign team roles and issue the briefing from the command panel first.';toast('Team briefing required before escort.');return}
-  r.state='escorting';logRadio('UNIT 04: '+r.name+' accepted voluntary accompaniment.');r.person.group.traverse(o=>{if(o.material?.color)o.material.color.set(0x79a995)});
+  r.state='escorting';decisionScore+=1;supportActions++;logRadio('UNIT 04: '+r.name+' accepted voluntary accompaniment.');r.person.group.traverse(o=>{if(o.material?.color)o.material.color.set(0x79a995)});
   dialogueLine.textContent='Thank you. I will walk with you to the community plaza.';
   toast(r.name+' accepted your offer to accompany them.');
   dialogueOpen=false;dialogue.classList.add('hidden');selectedResident=null;activeResident=null;
@@ -212,15 +214,38 @@ if(briefButton)briefButton.addEventListener('click',()=>{
  const roles=[...document.querySelectorAll('.team-role')].map(el=>el.value);
  const order=document.querySelector('#team-order')?.value||'Resident support';
  if(new Set(roles).size!==3){toast('Assign a different responsibility to each team member.');return}
- teamBriefed=true;
+ teamBriefed=true;teamAssignments=roles;briefingTask=order;
+ teamActivities=[
+  {name:'A. MORGAN',role:roles[0],status:'STANDING BY'},
+  {name:'S. LEE',role:roles[1],status:'STANDING BY'},
+  {name:'J. PATEL',role:roles[2],status:'STANDING BY'}
+ ];
+ const liaisonIndex=roles.findIndex(role=>role==='Resident liaison');
+ const medicalIndex=roles.findIndex(role=>role==='Medical liaison');
+ const coordinationIndex=roles.findIndex(role=>role==='Team coordination');
+ if(liaisonIndex>=0)teamActivities[liaisonIndex].status='RESIDENT SUPPORT READY';
+ if(medicalIndex>=0)teamActivities[medicalIndex].status='WELFARE COORDINATION READY';
+ if(coordinationIndex>=0)teamActivities[coordinationIndex].status='DISPATCH COORDINATION READY';
  logRadio('UNIT 04: Team briefed. Roles: '+roles.join(', ')+'. Task: '+order+'.');
+ updateHud();
  toast('Team briefing issued. Responsibilities recorded.');
 });
 
 
+function updateTeamActivities(){
+ if(!teamBriefed)return;
+ const waiting=residents.filter(r=>r.state==='waiting').length;
+ teamActivities.forEach(member=>{
+  if(member.role==='Resident liaison')member.status=waiting?'MONITORING '+waiting+' RESIDENT(S)':'RESIDENT SUPPORT COMPLETE';
+  else if(member.role==='Medical liaison')member.status='WELFARE CHANNEL AVAILABLE';
+  else if(member.role==='Team coordination')member.status=activeDispatch?'SUPPORTING DISPATCH RESPONSE':'COORDINATING UNIT';
+ });
+ updateHud();
+}
 function raiseDispatchEvent(event){
  if(activeDispatch||complete)return;
  activeDispatch=event;
+ updateTeamActivities();
  logRadio('DISPATCH: '+event.title+' — '+event.text);
  updateHud();
  toast('New dispatch update received.');
@@ -230,13 +255,14 @@ function resolveDispatch(choice){
  const event=activeDispatch;
  if(event.id==='power'){
   const message=choice==='verify'?'UNIT 04: Power status remains UNCONFIRMED. Information will not be presented as verified.':'UNIT 04: Requested a fresh status update from utility control.';
-  logRadio(message);
+  logRadio(message);decisionScore+=choice==='verify'?2:1;if(choice==='verify')verifiedInfo++;
  }else if(event.id==='medical'){
   const message=choice==='assign'?'UNIT 04: Medical liaison assigned to coordinate a resident welfare check.':'UNIT 04: Welfare concern acknowledged. Continue monitoring and request support if needed.';
-  logRadio(message);
+  logRadio(message);decisionScore+=choice==='assign'?2:1;if(choice==='assign'){const m=teamActivities.find(a=>a.role==='Medical liaison');if(m)m.status='WELFARE CHECK COORDINATED'}
  }
  dispatchResolved++;
  activeDispatch=null;
+ updateTeamActivities();
  updateHud();
  toast('Dispatch update acknowledged.');
  if(started&&!complete){paused=false;pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.()}
@@ -298,11 +324,16 @@ function update(dt,t){
   if(distance>1.15){dir.normalize();g.position.addScaledVector(dir,Math.min(1.75*dt,distance-1.05));g.rotation.y=Math.atan2(dir.x,dir.z);walking=true}
   const atPlaza=camera.position.distanceTo(assembly)<4.2&&g.position.distanceTo(assembly)<5.8;
   if(atPlaza){
-   r.state='safe';assisted++;updateHud();toast(r.name+' has arrived at the community plaza.');
+   r.state='safe';assisted++;decisionScore+=2;updateTeamActivities();logRadio('UNIT 04: '+r.name+' arrived at the community plaza.');updateHud();toast(r.name+' has arrived at the community plaza.');
    if(assisted===3){
     complete=true;
     const thoughtfulSupport=residents.filter(person=>person.informed&&person.needsDiscussed).length;
-    const rating=!radioReady?'COMMS INCOMPLETE':thoughtfulSupport===3?'EXCELLENT':thoughtfulSupport>=1?'COMMENDABLE':'COMPLETED';
+    missionEndedAt=performance.now();
+    const rating=!radioReady?'COMMS INCOMPLETE':thoughtfulSupport===3&&dispatchResolved===2&&decisionScore>=16?'EXCELLENT':thoughtfulSupport>=1&&dispatchResolved>=1?'COMMENDABLE':'COMPLETED';
+    const duration=Math.max(0,Math.round((missionEndedAt-missionStartedAt)/1000));
+    const mins=String(Math.floor(duration/60)).padStart(2,'0'),secs=String(duration%60).padStart(2,'0');
+    const report=document.querySelector('#report-details');
+    if(report)report.innerHTML='<div><span>MISSION TIME</span><b>'+mins+':'+secs+'</b></div><div><span>DECISION SCORE</span><b>'+decisionScore+'</b></div><div><span>DISPATCH UPDATES</span><b>'+dispatchResolved+'/2</b></div><div><span>VERIFIED INFORMATION</span><b>'+verifiedInfo+'</b></div><div><span>SUPPORT ACTIONS</span><b>'+supportActions+'</b></div><div><span>RESIDENTS SAFE</span><b>'+assisted+'/3</b></div>';
     setTimeout(()=>{completeScreen.classList.remove('hidden');document.exitPointerLock?.();document.querySelector('#final-count').textContent='03 / 03';document.querySelector('#final-rating').textContent=rating},800)
    }
   }
