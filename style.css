@@ -71,3 +71,11 @@
 .scenario-select label{display:block;font-size:8px;letter-spacing:1.1px;color:#d9b66e;margin-bottom:7px;font-weight:800}
 .scenario-select select{width:100%;padding:9px 8px;background:#1c2a31;border:1px solid #66777b;color:#edf1ee;font:700 10px Inter,sans-serif}
 .scenario-select p{margin:8px 0 0;color:#b8c6c8;font-size:9px;line-height:1.5}
+
+/* Police incident-response visual language */
+.brief-card{border-top:3px solid #c49b54}
+.brief-card .eyebrow{letter-spacing:1.7px}
+.scenario-select{border-left:2px solid #b58d4e;background:rgba(10,18,23,.62)}
+.scenario-select label{color:#d8b779}
+.mission-panel .panel-head>span:first-child{letter-spacing:1.4px}
+.status-pill{border-color:rgba(191,155,93,.42)}
