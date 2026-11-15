@@ -29,7 +29,7 @@
         <div><small>PRIORITY</small><strong class="amber">PUBLIC SAFETY</strong></div>
         <div><small>OBJECTIVE</small><strong>GUIDE 3 RESIDENTS</strong></div>
       </div>
-      <div class="brief-note"><span>MISSION PARAMETERS</span><p>Establish radio contact with dispatch (R), confirm resident needs, then coordinate voluntary assistance to the assembly area. Treat unverified reports as unconfirmed.</p></div>
+      <div class="brief-note"><span>MISSION PARAMETERS</span><p>Establish radio contact (R), assign three distinct team responsibilities and issue the team briefing. Confirm resident needs, then coordinate voluntary assistance to the assembly area.</p></div>
       <button id="start" class="primary-btn">BEGIN RESPONSE <span>→</span></button>
       <div class="brief-foot">WASD MOVE <i>·</i> MOUSE LOOK <i>·</i> E INTERACT <i>·</i> R RADIO <i>·</i> ESC PAUSE</div>
     </div>
@@ -57,6 +57,16 @@
       <p id="radio-log">NO OUTBOUND REPORT RECORDED</p>
       <div class="command-hint"><kbd>R</kbd> RADIO CHECK</div>
     </div>
+    <div class="team-command">
+      <div class="roster-title">RESPONSE TEAM / ASSIGNMENTS</div>
+      <label class="team-member">A. MORGAN <select class="team-role"><option value="Team coordination">TEAM COORDINATION</option><option value="Resident liaison">RESIDENT LIAISON</option><option value="Medical liaison">MEDICAL LIAISON</option></select></label>
+      <label class="team-member">S. LEE <select class="team-role"><option value="Resident liaison">RESIDENT LIAISON</option><option value="Team coordination">TEAM COORDINATION</option><option value="Medical liaison">MEDICAL LIAISON</option></select></label>
+      <label class="team-member">J. PATEL <select class="team-role"><option value="Medical liaison">MEDICAL LIAISON</option><option value="Team coordination">TEAM COORDINATION</option><option value="Resident liaison">RESIDENT LIAISON</option></select></label>
+      <label class="team-member task-member">ASSIGNED TASK <select id="team-order"><option>Resident support</option><option>Medical coordination</option><option>Public information</option></select></label>
+      <div class="command-state" id="team-state">BRIEFING REQUIRED</div>
+      <button id="issue-briefing" class="briefing-btn">ISSUE TEAM BRIEFING</button>
+    </div>
+    <div class="radio-transcript-wrap"><div class="roster-title">RADIO TRAFFIC / LAST MESSAGES</div><div id="radio-transcript" aria-live="polite"><div class="radio-entry muted">NO TRAFFIC LOGGED</div></div></div>
     <div class="panel-bottom"><span>ASSEMBLY POINT</span><b>COMMUNITY PLAZA</b></div>
   </aside>
 
