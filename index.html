@@ -61,10 +61,10 @@
     <div class="panel-head"><span>UNIT 04 / ACTIVE CALL</span><span class="status-pill">ON DUTY</span></div>
     <h2 id="mission-title">CIVIC QUARTER<br>WELFARE CHECK</h2>
     <p class="subline" id="mission-subline">SPECIAL RESPONSE / SECTOR 04</p>
-    <div class="objective"><div class="objective-icon">◎</div><div><b>Resolve the call with a documented outcome</b><small id="objective-count">People contacted <strong>0 / 3</strong></small></div></div>
+    <div class="objective"><div class="objective-icon">◎</div><div><b>Complete three documented contacts and resolve both dispatch updates</b><small id="objective-count">Contacts documented <strong>0 / 3</strong></small></div></div>
     <div class="progress-track"><div id="progress-fill"></div></div>
     <div class="resident-roster" aria-label="Person status">
-      <div class="roster-title">PERSONS / WELFARE STATUS</div>
+      <div class="roster-title">CONTACTS / CASE STATUS</div>
       <div class="resident-row" id="resident-row-0"><span class="resident-dot"></span><span class="resident-name">MAYA CHEN</span><b id="resident-status-0">AWAITING CONTACT</b></div>
       <div class="resident-row" id="resident-row-1"><span class="resident-dot"></span><span class="resident-name">DANIEL BROOKS</span><b id="resident-status-1">AWAITING CONTACT</b></div>
       <div class="resident-row" id="resident-row-2"><span class="resident-dot"></span><span class="resident-name">ELENA RIVERA</span><b id="resident-status-2">AWAITING CONTACT</b></div>
@@ -93,7 +93,7 @@
     <div class="dispatch-count" id="dispatch-count">UPDATES RESOLVED: 0/2</div>
     <div class="team-activity-wrap"><div class="roster-title">UNIT STATUS / LIVE</div><div id="team-activity"><div class="radio-entry muted">AWAITING TEAM BRIEFING</div></div></div>
     <div class="radio-transcript-wrap"><div class="roster-title">INCIDENT COMMS / LAST MESSAGES</div><div id="radio-transcript" aria-live="polite"><div class="radio-entry muted">NO TRAFFIC LOGGED</div></div></div>
-    <div class="panel-bottom"><span>RESOLUTION LOCATION</span><b>COMMUNITY PLAZA</b></div>
+    <div class="panel-bottom"><span>CASE RESOLUTION</span><b>INCIDENT REPORT</b></div>
   </aside>
 
   <div class="interaction" id="interaction"><span class="keycap">E</span><span id="interaction-text">OFFER ASSISTANCE</span></div>
@@ -104,9 +104,9 @@
     <div class="dialogue-actions">
       <button class="dialogue-choice" data-choice="explain">Explain the situation</button>
       <button class="dialogue-choice" data-choice="needs">Ask what they need</button>
-      <button class="dialogue-choice primary-choice" data-choice="guide">Offer to accompany them</button>
+      <button class="dialogue-choice primary-choice" data-choice="record">Record contact and close</button>
     </div>
-    <div class="dialogue-hint">Choose a response. You can ask questions before offering help.</div>
+    <div class="dialogue-hint">Explain the confirmed information, listen to their needs, then document the contact.</div>
   </section>
   <div class="center-reticle"><span></span></div>
   <div class="location-tag"><span class="location-pin">◆</span><span id="location">CIVIC QUARTER / EAST AVENUE</span></div>
@@ -116,8 +116,8 @@
     <div class="complete-card">
       <div class="success-icon">✓</div><div class="eyebrow">CALL OUT CLOSED</div>
       <h2>INCIDENT<br><em>RESOLVED.</em></h2>
-      <p>The call has been concluded. Review the unit's communication, welfare support and incident documentation.</p>
-      <div class="score-row"><span>PEOPLE ASSISTED</span><b id="final-count">03 / 03</b></div>
+      <p>The call has been concluded. Review the unit's communication, documented contacts, verified information and incident record.</p>
+      <div class="score-row"><span>CONTACTS DOCUMENTED</span><b id="final-count">03 / 03</b></div>
       <div class="score-row"><span>RESPONSE RATING</span><b class="amber" id="final-rating">COMMENDABLE</b></div>
       <div class="report-details" id="report-details"></div>
       <button id="replay" class="primary-btn">REPLAY SIMULATION <span>↻</span></button>
