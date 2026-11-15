@@ -81,3 +81,6 @@ The previous escort-to-plaza objective has been replaced. Each contact now requi
 - Added street furniture, planters, bins, road markings and district signage to give the playable block more visual landmarks.
 - Added subtle first-person movement head-bob and a responsive audio control.
 - Audio is synthesized locally with Web Audio; no external sound files or tracking services are used.
+
+- Added a post-call lifecycle: after returning to the operations room, select a new call-out. Mission counters, dispatch updates, resident states, briefing and contact records reset without resetting saved career progression. Re-deploying a completed incident is blocked.
+- Audio now reuses one Web Audio context and fades the ambient layer in/out instead of creating a new context on every toggle.
