@@ -10,6 +10,7 @@ A browser-based 3D public-safety response game prototype. This original project 
 - Enterable community response center with a reception counter, public seating, windows and interior lighting.
 - Basic movement collision around parked vehicles and the response-center structure.
 - Branching resident conversations: explain the situation, ask about individual needs, or offer to accompany each resident.
+- Residents follow the player in a loose formation after accepting an escort; the player must lead them into the marked community plaza to complete the mission.
 - Mission HUD, progress tracking, pause/resume and completion screen.
 - Responsive interface; keyboard and mouse are currently the intended control scheme.
 
