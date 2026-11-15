@@ -25,9 +25,11 @@ try {
   await page.locator('#audio-toggle').click();
   assert.equal(await page.locator('#audio-toggle').textContent(),'AUDIO ON','audio should turn on again');
   const roles=page.locator('.team-role');
-  await roles.nth(2).scrollIntoViewIfNeeded();
+  await roles.nth(0).scrollIntoViewIfNeeded();
   await roles.nth(0).selectOption('Team coordination');
+  await roles.nth(1).scrollIntoViewIfNeeded();
   await roles.nth(1).selectOption('Resident liaison');
+  await roles.nth(2).scrollIntoViewIfNeeded();
   await roles.nth(2).selectOption('Medical liaison');
   await page.locator('#issue-briefing').click();
   assert.match(await page.locator('#team-state').textContent(),/TEAM BRIEFED/);
