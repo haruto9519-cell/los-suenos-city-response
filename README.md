@@ -4,10 +4,10 @@ A browser-based 3D public-safety response game prototype. This original project 
 
 ## Current playable slice
 
-- Three.js 3D city block with roads, sidewalks, buildings, street furniture, vehicles and a civic assembly plaza.
+- Three.js 3D city block with roads, sidewalks, buildings, street furniture and vehicles.
 - First-person movement and mouse-look.
 - Three documented civilian contacts: explain confirmed information, listen to individual needs, and close each contact with a recorded outcome.
-- Enterable community response center with a reception counter, public seating, windows and interior lighting.
+- Enterable civic response center with a reception counter, public seating, windows and interior lighting.
 - Basic movement collision around parked vehicles and the response-center structure.
 - Branching resident conversations: explain the situation, ask about individual needs, or offer to accompany each resident.
 - Contact records update the live case roster and radio transcript; the incident closes only after all three contacts and both dispatch updates are documented.
@@ -39,7 +39,7 @@ Serve this folder with any static web server. Because the game uses JavaScript E
 
 ## Roadmap
 
-1. Expand collision coverage to street furniture, building corners and NPC navigation.
+1. Build a dedicated police-station operations hub and add visible unit personnel.
 2. Add conversation memory and more varied assistance outcomes.
 3. Add additional enterable buildings and richer environmental storytelling.
 4. Add additional districts, mission scenarios and persistent progression.
@@ -47,7 +47,7 @@ Serve this folder with any static web server. Because the game uses JavaScript E
 
 ## Project status
 
-This is an early playable prototype, not a finished commercial game. The current mission focuses on civilian contact, information verification, welfare needs, dispatch coordination and incident documentation.
+This is an early playable prototype, not a finished commercial game. The current mission focuses on civilian contact, information verification, welfare needs, dispatch coordination and incident documentation. The former plaza escort marker and follow-the-player objective have been removed.
 
 - Timed dispatch updates: after radio contact and team briefing, utility-status verification and resident-welfare coordination updates arrive during the mission. Player responses are recorded in the radio transcript.
 
