@@ -1,13 +1,15 @@
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 
-const browser = await chromium.launch({headless:true,args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});
+const browser = await chromium.launch({headless:true,args:['--enable-webgl','--ignore-gpu-blocklist','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const page = await browser.newPage({viewport:{width:1440,height:900}});
-const pageErrors=[];
+const pageErrors=[],consoleErrors=[],failedRequests=[];
 page.on('pageerror',error=>pageErrors.push(error.message));
+page.on('console',msg=>{if(msg.type()==='error')consoleErrors.push(msg.text())});
+page.on('requestfailed',req=>failedRequests.push({url:req.url(),error:req.failure()?.errorText}));
 try {
-  await page.goto('http://127.0.0.1:4173/?e2e=1',{waitUntil:'networkidle',timeout:60000});
-  await page.waitForFunction(()=>!!window.__LOS_E2E__,{timeout:15000});
+  await page.goto('http://127.0.0.1:4173/?e2e=1',{waitUntil:'domcontentloaded',timeout:60000});
+  await page.waitForFunction(()=>!!window.__LOS_E2E__,null,{timeout:20000});
   await page.waitForSelector('canvas',{timeout:15000});
   assert.equal(await page.locator('#briefing').isVisible(),true,'briefing should be visible on launch');
 
@@ -72,6 +74,9 @@ try {
 } catch(error) {
   await page.screenshot({path:'/tmp/los-suenos-e2e-failure.png',fullPage:true}).catch(()=>{});
   console.error(error);
+  console.error('PAGE ERRORS',JSON.stringify(pageErrors));
+  console.error('CONSOLE ERRORS',JSON.stringify(consoleErrors));
+  console.error('FAILED REQUESTS',JSON.stringify(failedRequests));
   process.exitCode=1;
 } finally {
   await browser.close();
