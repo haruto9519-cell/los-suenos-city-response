@@ -21,25 +21,25 @@
 
   <section id="briefing" class="overlay">
     <div class="brief-card">
-      <div class="eyebrow">LOS SUENOS MUNICIPAL RESPONSE SERVICE <span>•</span> SIMULATION 01</div>
-      <h1>FIRST<br><em>RESPONSE</em></h1>
-      <p class="brief-lead" id="brief-lead">A power fault has disrupted part of the Civic Quarter. Several residents remain in the area. Coordinate a calm, orderly evacuation to the marked assembly point.</p>
+      <div class="eyebrow">LOS SUENOS POLICE DEPARTMENT <span>•</span> SPECIAL RESPONSE UNIT</div>
+      <h1>SPECIAL<br><em>RESPONSE</em></h1>
+      <p class="brief-lead" id="brief-lead">Unit 04 is assigned to a residential welfare call in the Civic Quarter. Establish communications, identify the people involved, assess their needs and complete a documented, peaceful resolution.</p>
       <div class="scenario-select">
-        <label for="scenario-select">SELECT RESPONSE SCENARIO</label>
+        <label for="scenario-select">SELECT CALL OUT</label>
         <select id="scenario-select">
-          <option value="power">01 / CIVIC QUARTER — POWER OUTAGE</option>
-          <option value="weather">02 / RIVERSIDE — SEVERE WEATHER</option>
-          <option value="transit">03 / CENTRAL STATION — TRANSIT DISRUPTION</option>
+          <option value="welfare">01 / CIVIC QUARTER — WELFARE CHECK</option>
+          <option value="missing">02 / CIVIC QUARTER — MISSING PERSON FOLLOW-UP</option>
+          <option value="alarm">03 / MARKET STREET — COMMERCIAL ALARM</option>
         </select>
-        <p id="scenario-description">A local power fault has disrupted the Civic Quarter. Confirm resident needs and coordinate safe assistance.</p>
+        <p id="scenario-description">A resident welfare call. Speak with the people involved, verify information and arrange appropriate support.</p>
       </div>
       <div class="brief-grid">
-        <div><small>SECTOR</small><strong>CIVIC QUARTER</strong></div>
-        <div><small>PRIORITY</small><strong class="amber">PUBLIC SAFETY</strong></div>
-        <div><small>OBJECTIVE</small><strong>GUIDE 3 RESIDENTS</strong></div>
+        <div><small>UNIT</small><strong>UNIT 04</strong></div>
+        <div><small>PRIORITY</small><strong class="amber">CONTROLLED RESPONSE</strong></div>
+        <div><small>OBJECTIVE</small><strong>RESOLVE INCIDENT</strong></div>
       </div>
-      <div class="brief-note"><span>MISSION PARAMETERS</span><p>Establish radio contact (R), assign three distinct team responsibilities and issue the team briefing. Confirm resident needs, then coordinate voluntary assistance to the assembly area.</p></div>
-      <button id="start" class="primary-btn">BEGIN RESPONSE <span>→</span></button>
+      <div class="brief-note"><span>CALL OUT BRIEFING</span><p>Confirm dispatch contact, assign team responsibilities and issue the briefing. Prioritize clear communication, civilian welfare, verified information and a complete incident report.</p></div>
+      <button id="start" class="primary-btn">ACCEPT CALL OUT <span>→</span></button>
       <div class="brief-foot">WASD MOVE <i>·</i> MOUSE LOOK <i>·</i> E INTERACT <i>·</i> R RADIO <i>·</i> ESC PAUSE</div>
     </div>
   </section>
@@ -49,25 +49,25 @@
   </section>
 
   <aside class="mission-panel">
-    <div class="panel-head"><span>ACTIVE RESPONSE</span><span class="status-pill">IN PROGRESS</span></div>
-    <h2 id="mission-title">CIVIC QUARTER<br>EVACUATION</h2>
-    <p class="subline" id="mission-subline">PUBLIC ASSISTANCE / SECTOR 04</p>
-    <div class="objective"><div class="objective-icon">◎</div><div><b>Listen, inform and guide residents</b><small id="objective-count">Residents assisted <strong>0 / 3</strong></small></div></div>
+    <div class="panel-head"><span>UNIT 04 / ACTIVE CALL</span><span class="status-pill">ON DUTY</span></div>
+    <h2 id="mission-title">CIVIC QUARTER<br>WELFARE CHECK</h2>
+    <p class="subline" id="mission-subline">SPECIAL RESPONSE / SECTOR 04</p>
+    <div class="objective"><div class="objective-icon">◎</div><div><b>Resolve the call with a documented outcome</b><small id="objective-count">People contacted <strong>0 / 3</strong></small></div></div>
     <div class="progress-track"><div id="progress-fill"></div></div>
-    <div class="resident-roster" aria-label="Resident status">
-      <div class="roster-title">RESIDENT STATUS</div>
+    <div class="resident-roster" aria-label="Person status">
+      <div class="roster-title">PERSONS / WELFARE STATUS</div>
       <div class="resident-row" id="resident-row-0"><span class="resident-dot"></span><span class="resident-name">MAYA CHEN</span><b id="resident-status-0">AWAITING CONTACT</b></div>
       <div class="resident-row" id="resident-row-1"><span class="resident-dot"></span><span class="resident-name">DANIEL BROOKS</span><b id="resident-status-1">AWAITING CONTACT</b></div>
       <div class="resident-row" id="resident-row-2"><span class="resident-dot"></span><span class="resident-name">ELENA RIVERA</span><b id="resident-status-2">AWAITING CONTACT</b></div>
     </div>
     <div class="command-net">
-      <div class="roster-title">COMMAND NET / DISPATCH</div>
+      <div class="roster-title">RADIO / DISPATCH CONTROL</div>
       <div class="command-state"><span class="resident-dot" id="radio-dot"></span><b id="radio-state">AWAITING RADIO CHECK</b></div>
       <p id="radio-log">NO OUTBOUND REPORT RECORDED</p>
       <div class="command-hint"><kbd>R</kbd> RADIO CHECK</div>
     </div>
     <div class="team-command">
-      <div class="roster-title">RESPONSE TEAM / ASSIGNMENTS</div>
+      <div class="roster-title">UNIT 04 / PERSONNEL ASSIGNMENTS</div>
       <label class="team-member">A. MORGAN <select class="team-role"><option value="Team coordination">TEAM COORDINATION</option><option value="Resident liaison">RESIDENT LIAISON</option><option value="Medical liaison">MEDICAL LIAISON</option></select></label>
       <label class="team-member">S. LEE <select class="team-role"><option value="Resident liaison">RESIDENT LIAISON</option><option value="Team coordination">TEAM COORDINATION</option><option value="Medical liaison">MEDICAL LIAISON</option></select></label>
       <label class="team-member">J. PATEL <select class="team-role"><option value="Medical liaison">MEDICAL LIAISON</option><option value="Team coordination">TEAM COORDINATION</option><option value="Resident liaison">RESIDENT LIAISON</option></select></label>
@@ -82,9 +82,9 @@
       <button id="dispatch-choice-b" class="dispatch-choice secondary">REQUEST SUPPORT</button>
     </div>
     <div class="dispatch-count" id="dispatch-count">UPDATES RESOLVED: 0/2</div>
-    <div class="team-activity-wrap"><div class="roster-title">TEAM STATUS / LIVE</div><div id="team-activity"><div class="radio-entry muted">AWAITING TEAM BRIEFING</div></div></div>
-    <div class="radio-transcript-wrap"><div class="roster-title">RADIO TRAFFIC / LAST MESSAGES</div><div id="radio-transcript" aria-live="polite"><div class="radio-entry muted">NO TRAFFIC LOGGED</div></div></div>
-    <div class="panel-bottom"><span>ASSEMBLY POINT</span><b>COMMUNITY PLAZA</b></div>
+    <div class="team-activity-wrap"><div class="roster-title">UNIT STATUS / LIVE</div><div id="team-activity"><div class="radio-entry muted">AWAITING TEAM BRIEFING</div></div></div>
+    <div class="radio-transcript-wrap"><div class="roster-title">INCIDENT COMMS / LAST MESSAGES</div><div id="radio-transcript" aria-live="polite"><div class="radio-entry muted">NO TRAFFIC LOGGED</div></div></div>
+    <div class="panel-bottom"><span>RESOLUTION LOCATION</span><b>COMMUNITY PLAZA</b></div>
   </aside>
 
   <div class="interaction" id="interaction"><span class="keycap">E</span><span id="interaction-text">OFFER ASSISTANCE</span></div>
@@ -105,10 +105,10 @@
 
   <section id="complete" class="overlay hidden">
     <div class="complete-card">
-      <div class="success-icon">✓</div><div class="eyebrow">RESPONSE COMPLETE</div>
-      <h2>COMMUNITY<br><em>SAFE.</em></h2>
-      <p>All residents have reached the assembly point. Your calm coordination helped the Civic Quarter respond safely.</p>
-      <div class="score-row"><span>RESIDENTS ASSISTED</span><b id="final-count">03 / 03</b></div>
+      <div class="success-icon">✓</div><div class="eyebrow">CALL OUT CLOSED</div>
+      <h2>INCIDENT<br><em>RESOLVED.</em></h2>
+      <p>The call has been concluded. Review the unit's communication, welfare support and incident documentation.</p>
+      <div class="score-row"><span>PEOPLE ASSISTED</span><b id="final-count">03 / 03</b></div>
       <div class="score-row"><span>RESPONSE RATING</span><b class="amber" id="final-rating">COMMENDABLE</b></div>
       <div class="report-details" id="report-details"></div>
       <button id="replay" class="primary-btn">REPLAY SIMULATION <span>↻</span></button>
