@@ -39,7 +39,7 @@ Serve this folder with any static web server. Because the game uses JavaScript E
 
 ## Roadmap
 
-1. Add a return-to-station sequence and a dedicated post-call debrief scene.
+1. Add promotion milestones, persistent team-member development and more call-out scenarios.
 2. Add conversation memory and more varied assistance outcomes.
 3. Add additional enterable buildings and richer environmental storytelling.
 4. Add additional districts, mission scenarios and persistent progression.
@@ -65,6 +65,9 @@ The call-out selector offers Civic Quarter Welfare Check, Civic Quarter Missing 
 
 ## Pre-deployment preparation
 Added a pre-deployment preparation panel with selectable protective equipment, communications equipment and support equipment. The selected configuration is logged at call-out acceptance and included in the after-action report. This is a presentation and continuity feature; selections do not provide real-world tactical guidance or change weapon capabilities.
+
+## Persistent unit career and post-call debrief
+After a completed call-out, the player can return to the operations room. The station displays a local career record: completed calls, earned experience, commendations and the latest result. The record is stored in the current browser using local storage; clearing browser data resets it. A return-to-station transition is available from the completion report.
 
 ## 3D operations room
 The player begins in a furnished Unit 04 operations room with a wall briefing display, workstations and three visible unit members. The player reviews the team panel, issues a distinct-responsibility briefing and then deploys to the city. Mission timing and dispatch updates begin on deployment, not while standing in the station.
