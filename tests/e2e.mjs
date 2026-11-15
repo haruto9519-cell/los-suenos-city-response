@@ -25,6 +25,7 @@ try {
   await page.locator('#audio-toggle').click();
   assert.equal(await page.locator('#audio-toggle').textContent(),'AUDIO ON','audio should turn on again');
   const roles=page.locator('.team-role');
+  await roles.nth(2).scrollIntoViewIfNeeded();
   await roles.nth(0).selectOption('Team coordination');
   await roles.nth(1).selectOption('Resident liaison');
   await roles.nth(2).selectOption('Medical liaison');
