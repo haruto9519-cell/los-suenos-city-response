@@ -122,6 +122,37 @@ const scenarios={
  alarm:{title:'MARKET STREET ALARM CALL',sector:'SPECIAL RESPONSE / SECTOR 09',lead:'Unit 04 is assigned to a commercial alarm call on Market Street. Establish contact with the responsible parties, verify the available information and record a clear outcome.',description:'A commercial alarm call. Verify the report with responsible parties and preserve an accurate incident record.',event1:{id:'power',title:'DISPATCH / INFORMATION UPDATE 01',text:'The alarm provider cannot yet confirm the source of the alert. Keep the incident status pending verification.'},event2:{id:'medical',title:'SUPPORT REQUEST / UPDATE 02',text:'Dispatch advises that a staff member may require assistance. Coordinate a suitable support referral and record the result.'}}
 }
 let activeScenario=scenarios.welfare;
+let activeScenarioKey='welfare';
+const scenarioContacts={
+ welfare:[
+  {name:'Maya Chen',opening:'I requested a welfare check because I have not been able to reach my brother. I can explain what I know.',need:'I last heard from my brother this morning. I would like help confirming whether anyone has checked the address.'},
+  {name:'Daniel Brooks',opening:'I am a neighbour. I heard a disagreement earlier, but I do not know exactly what happened.',need:'I can share what I personally heard, but I do not want assumptions recorded as facts.'},
+  {name:'Elena Rivera',opening:'I manage this building. I can help confirm who lives here and which information is current.',need:'Please tell me what details you need and how the information will be recorded.'}
+ ],
+ missing:[
+  {name:'Olivia Park',opening:'I am a friend of the person reported missing. I can tell you when we last spoke.',need:'We last spoke yesterday afternoon. I have a recent message that may help confirm the timeline.'},
+  {name:'Marcus Hill',opening:'I work nearby and may have seen the person earlier. I am not certain of the time.',need:'I can describe what I remember, but please mark the time as approximate.'},
+  {name:'Sofia Alvarez',opening:'I know the family. They are worried and want clear updates from the department.',need:'The family would like one reliable contact for updates and a clear explanation of what happens next.'}
+ ],
+ alarm:[
+  {name:'Nina Patel',opening:'I am the store manager. The alarm notification came through after closing.',need:'I can confirm the closing checklist and provide the alarm company contact details.'},
+  {name:'Luis Romero',opening:'I supervise the evening shift. I was nearby when the alert came in.',need:'I noticed the rear service door was not showing as secured on the checklist. I can explain what I checked.'},
+  {name:'Grace Kim',opening:'I handle building access records. I can help verify the information available to us.',need:'The access log is available, but one entry needs a second check before it is treated as confirmed.'}
+ ]
+};
+function applyScenarioContacts(){
+ const contacts=scenarioContacts[activeScenarioKey]||scenarioContacts.welfare;
+ residents.forEach((r,i)=>{
+  const contact=contacts[i];
+  r.name=contact.name;r.opening=contact.opening;r.need=contact.need;
+  r.state='waiting';r.informed=false;r.needsDiscussed=false;
+  const name=document.querySelector('#resident-name-'+i);
+  if(name)name.textContent=contact.name.toUpperCase();
+  r.person.group.traverse(o=>{if(o.material?.color)o.material.color.set(0xffffff)});
+ });
+ updateHud();
+}
+applyScenarioContacts();
 
 const prepSelections={protection:'Standard protective vest',comms:'Radio and earpiece',support:'First aid pouch'};
 function readPreparation(){
@@ -139,7 +170,7 @@ function readPreparation(){
 readPreparation();
 
 const scenarioSelect=document.querySelector('#scenario-select');
-scenarioSelect?.addEventListener('change',()=>{activeScenario=scenarios[scenarioSelect.value]||scenarios.welfare;document.querySelector('#brief-lead').textContent=activeScenario.lead;document.querySelector('#scenario-description').textContent=activeScenario.description;document.querySelector('#mission-title').textContent=activeScenario.title;document.querySelector('#mission-subline').textContent=activeScenario.sector;});
+scenarioSelect?.addEventListener('change',()=>{activeScenarioKey=scenarioSelect.value;activeScenario=scenarios[activeScenarioKey]||scenarios.welfare;applyScenarioContacts();document.querySelector('#brief-lead').textContent=activeScenario.lead;document.querySelector('#scenario-description').textContent=activeScenario.description;document.querySelector('#mission-title').textContent=activeScenario.title;document.querySelector('#mission-subline').textContent=activeScenario.sector;});
 let yaw=0,pitch=0,started=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false,radioReady=false,teamBriefed=false,radioEntries=[],missionStartElapsed=0,dispatchEventOne=false,dispatchEventTwo=false,activeDispatch=null,dispatchResolved=0,teamAssignments=[],teamActivities=[],briefingTask='Resident support',missionStartedAt=0,missionEndedAt=0,decisionScore=0,verifiedInfo=0,supportActions=0;
 const keys={};const clock=new THREE.Clock();
 
@@ -204,7 +235,7 @@ renderer.domElement.addEventListener('click',()=>{if(started&&!paused&&!complete
 function openDialogue(r){
  if(!r||r.state!=='waiting')return;
  selectedResident=r;dialogueOpen=true;dialogueName.textContent=r.name.toUpperCase();
- dialogueLine.textContent=r.informed?'Thank you for explaining. What would you like me to do?':'Hello. I am not sure what is happening. Can you help me understand?';
+ dialogueLine.textContent=r.informed?'Thank you for explaining. What would you like me to do?':(r.opening||'Can you tell me what you know about this incident?');
  dialogue.classList.remove('hidden');interaction.classList.remove('visible');
 }
 function closeDialogue(){
