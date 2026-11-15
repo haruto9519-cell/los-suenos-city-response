@@ -6,11 +6,11 @@ A browser-based 3D public-safety response game prototype. This original project 
 
 - Three.js 3D city block with roads, sidewalks, buildings, street furniture, vehicles and a civic assembly plaza.
 - First-person movement and mouse-look.
-- One guided public-assistance mission: approach three residents, offer assistance, and accompany them to the marked community assembly point.
+- Three documented civilian contacts: explain confirmed information, listen to individual needs, and close each contact with a recorded outcome.
 - Enterable community response center with a reception counter, public seating, windows and interior lighting.
 - Basic movement collision around parked vehicles and the response-center structure.
 - Branching resident conversations: explain the situation, ask about individual needs, or offer to accompany each resident.
-- Residents follow the player in a loose formation after accepting an escort; the player must lead them into the marked community plaza to complete the mission.
+- Contact records update the live case roster and radio transcript; the incident closes only after all three contacts and both dispatch updates are documented.
 - Mission HUD, progress tracking, pause/resume and completion screen.
 - Incident command radio check: establish dispatch communications with R before offering an escort; command status is shown in the HUD.
 - Response-team assignments: give three distinct coordination, resident-liaison and medical-liaison responsibilities, select the mission task and issue a team briefing before escort activity.
@@ -21,7 +21,7 @@ A browser-based 3D public-safety response game prototype. This original project 
 
 - **W / A / S / D** — Move
 - **Mouse** — Look around (click the game view if pointer lock is not active)
-- **E** — Offer assistance when near a resident
+- **E** — Open a contact conversation when near a person
 - **Shift** — Move faster
 - **Esc** — Pause
 
@@ -47,7 +47,7 @@ Serve this folder with any static web server. Because the game uses JavaScript E
 
 ## Project status
 
-This is an early playable prototype, not a finished commercial game. The current mission focuses on public assistance, evacuation, communication and civilian safety.
+This is an early playable prototype, not a finished commercial game. The current mission focuses on civilian contact, information verification, welfare needs, dispatch coordination and incident documentation.
 
 - Timed dispatch updates: after radio contact and team briefing, utility-status verification and resident-welfare coordination updates arrive during the mission. Player responses are recorded in the radio transcript.
 
@@ -58,10 +58,13 @@ This is an early playable prototype, not a finished commercial game. The current
 
 
 ## Direction update — police incident-response simulation
-The project direction is now a fictional police special-response unit simulator with a grounded procedural tone inspired by Ready or Not's presentation and mission structure. The current playable loop focuses on dispatch communication, civilian contact, welfare support, verified information and incident reporting. It does not model real-world weapon handling, tactical entry or assault procedures.
+The project direction is now a fictional police special-response unit simulator with a grounded procedural tone inspired by Ready or Not's presentation and mission structure. The current playable loop focuses on dispatch communication, civilian interviews, welfare needs, verified information, documented contact outcomes and incident reporting. It does not model real-world weapon handling, tactical entry or assault procedures.
 
-The call-out selector offers Civic Quarter Welfare Check, Civic Quarter Missing Person Follow-up, and Market Street Commercial Alarm. These currently share the existing Civic Quarter environment and civilian-support gameplay loop; unique maps and distinct mission-specific NPC behavior remain future work.
+The call-out selector offers Civic Quarter Welfare Check, Civic Quarter Missing Person Follow-up, and Market Street Commercial Alarm. These currently share the existing Civic Quarter environment and three-contact casework loop; unique maps and distinct mission-specific NPC behavior remain future work.
 
 
 ## Pre-deployment preparation
 Added a pre-deployment preparation panel with selectable protective equipment, communications equipment and support equipment. The selected configuration is logged at call-out acceptance and included in the after-action report. This is a presentation and continuity feature; selections do not provide real-world tactical guidance or change weapon capabilities.
+
+## Incident casework update
+The previous escort-to-plaza objective has been replaced. Each contact now requires an explanation of confirmed information, a conversation about individual needs, and an explicit documented close-out. Dispatch updates must also be acknowledged before the incident can be closed. The after-action report records completed contacts and verified information.
