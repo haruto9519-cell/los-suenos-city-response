@@ -116,7 +116,7 @@ ring.rotation.x=-Math.PI/2;ring.position.set(0,.22,-48);scene.add(ring);
 const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,4,12),new THREE.MeshBasicMaterial({color:0x7bd0b0,transparent:true,opacity:.24}));beacon.position.set(0,2.1,-48);scene.add(beacon);
 const arrow=new THREE.Mesh(new THREE.ConeGeometry(.55,1.3,4),new THREE.MeshBasicMaterial({color:0xe7b65f}));arrow.rotation.x=Math.PI;arrow.position.set(0,4.4,-48);scene.add(arrow);
 
-let yaw=0,pitch=0,started=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false,radioReady=false;
+let yaw=0,pitch=0,started=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false,radioReady=false,teamBriefed=false,radioEntries=[];
 const keys={};const clock=new THREE.Clock();
 
 const interaction=document.querySelector('#interaction');
@@ -124,6 +124,11 @@ const interactionText=document.querySelector('#interaction-text');
 const briefing=document.querySelector('#briefing'),pauseScreen=document.querySelector('#pause'),completeScreen=document.querySelector('#complete');
 const dialogue=document.querySelector('#dialogue'),dialogueName=document.querySelector('#dialogue-name'),dialogueLine=document.querySelector('#dialogue-line');
 function toast(message){const el=document.querySelector('#toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1900)}
+function logRadio(message){
+ const stamp=document.querySelector('#clock')?.textContent||'08:42';
+ radioEntries.push({time:stamp,message});
+ updateHud();
+}
 function updateHud(){
  document.querySelector('#objective-count').innerHTML='Residents assisted <strong>'+assisted+' / 3</strong>';
  document.querySelector('#progress-fill').style.width=(assisted/3*100)+'%';
@@ -138,7 +143,11 @@ function updateHud(){
  const radioState=document.querySelector('#radio-state');
  const radioLog=document.querySelector('#radio-log');
  if(radioState){radioState.textContent=radioReady?'LINK ESTABLISHED':'AWAITING RADIO CHECK';radioState.classList.toggle('ready',radioReady)}
- if(radioLog)radioLog.textContent=radioReady?'UNIT 04: ON SCENE. REQUESTING INCIDENT UPDATE.':'NO OUTBOUND REPORT RECORDED';
+ if(radioLog)radioLog.textContent=radioReady?'UNIT 04: ON SCENE. DISPATCH CHANNEL OPEN.':'NO OUTBOUND REPORT RECORDED';
+ const teamState=document.querySelector('#team-state');
+ if(teamState){teamState.textContent=teamBriefed?'TEAM BRIEFED':'BRIEFING REQUIRED';teamState.classList.toggle('ready',teamBriefed)}
+ const log=document.querySelector('#radio-transcript');
+ if(log)log.innerHTML=radioEntries.slice(-4).map(entry=>'<div class="radio-entry"><span>'+entry.time+'</span> '+entry.message+'</div>').join('')||'<div class="radio-entry muted">NO TRAFFIC LOGGED</div>';
 }
 updateHud();
 function start(){started=true;paused=false;briefing.classList.add('hidden');pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.();clock.getDelta()}
@@ -152,7 +161,7 @@ document.addEventListener('keydown',e=>{
  if(e.code==='Escape'&&dialogueOpen){closeDialogue();return}
  if(e.code==='Escape'&&started&&!complete){paused=true;pauseScreen.classList.remove('hidden')}
  if(e.code==='KeyR'&&started&&!paused&&!complete&&!radioReady){
-  radioReady=true;updateHud();
+  radioReady=true;logRadio('DISPATCH: Unit 04 radio check acknowledged. Channel open.');
   toast('Dispatch: radio check acknowledged. Unit 04 is on the incident channel.');
  }
  if(e.code==='KeyE'&&started&&!paused&&!complete)interact()
@@ -179,7 +188,8 @@ function chooseDialogue(choice){
   toast('You listened to the resident.');
  }else if(choice==='guide'){
   if(!radioReady){dialogueLine.textContent='Before we move, please establish radio contact with dispatch. Press R to complete the radio check.';toast('Dispatch contact required before escort.');return}
-  r.state='escorting';r.person.group.traverse(o=>{if(o.material?.color)o.material.color.set(0x79a995)});
+  if(!teamBriefed){dialogueLine.textContent='The response team has not been briefed yet. Assign team roles and issue the briefing from the command panel first.';toast('Team briefing required before escort.');return}
+  r.state='escorting';logRadio('UNIT 04: '+r.name+' accepted voluntary accompaniment.');r.person.group.traverse(o=>{if(o.material?.color)o.material.color.set(0x79a995)});
   dialogueLine.textContent='Thank you. I will walk with you to the community plaza.';
   toast(r.name+' accepted your offer to accompany them.');
   dialogueOpen=false;dialogue.classList.add('hidden');selectedResident=null;activeResident=null;
@@ -189,6 +199,17 @@ function chooseDialogue(choice){
 function interact(){if(dialogueOpen){closeDialogue();return}if(activeResident)openDialogue(activeResident)}
 document.querySelectorAll('.dialogue-choice').forEach(button=>button.addEventListener('click',()=>chooseDialogue(button.dataset.choice)));
 document.querySelector('#dialogue-close').addEventListener('click',closeDialogue);
+
+const briefButton=document.querySelector('#issue-briefing');
+if(briefButton)briefButton.addEventListener('click',()=>{
+ const roles=[...document.querySelectorAll('.team-role')].map(el=>el.value);
+ const order=document.querySelector('#team-order')?.value||'Resident support';
+ if(new Set(roles).size!==3){toast('Assign a different responsibility to each team member.');return}
+ teamBriefed=true;
+ logRadio('UNIT 04: Team briefed. Roles: '+roles.join(', ')+'. Task: '+order+'.');
+ toast('Team briefing issued. Responsibilities recorded.');
+});
+
 function nearestResident(){let nearest=null,dist=3.4;for(const r of residents){if(r.state!=='waiting')continue;const d=camera.position.distanceTo(r.person.group.position);if(d<dist){dist=d;nearest=r}}return nearest}
 function update(dt,t){
  const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
