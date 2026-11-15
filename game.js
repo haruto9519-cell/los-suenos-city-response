@@ -85,6 +85,23 @@ for(const x of [-8,8])for(const z of [-52,-44])tree(x,z,.85);
 box(scene,0,1.2,-54,7,2.3,.25,mats.dark);
 box(scene,0,2.5,-54,7,.12,.4,mats.amber);
 const signText=makePerson(0,0,0xffffff,0xffffff,.01);scene.remove(signText.group);
+// Enterable community response center: open doorway, reception area and public seating.
+const interiorFloor=mat(0x777d79),interiorWall=mat(0xc3c0b4),interiorTrim=mat(0x59666a);
+box(scene,0,.12,-68,14,.24,18,interiorFloor,false);
+box(scene,-7,4.2,-68,.35,8.4,18,interiorWall);
+box(scene,7,4.2,-68,.35,8.4,18,interiorWall);
+box(scene,0,4.2,-77,14,8.4,.35,interiorWall);
+box(scene,-4.85,4.2,-59,4.3,8.4,.35,interiorWall);
+box(scene,4.85,4.2,-59,4.3,8.4,.35,interiorWall);
+const roofMat=new THREE.MeshStandardMaterial({color:0x89969a,transparent:true,opacity:.12,side:THREE.DoubleSide,roughness:1,depthWrite:false});
+box(scene,0,8.35,-68,14,.18,18,roofMat,false);
+box(scene,0,1.45,-70.8,5.4,1.15,1.15,interiorTrim);
+box(scene,0,2.08,-70.8,5.5,.12,1.2,mats.amber,false);
+for(const x of [-4.5,4.5]){box(scene,x,.65,-65,1.5,.25,2.2,interiorTrim);box(scene,x,.9,-65,1.5,.18,2.2,mats.concrete)}
+for(const x of [-5.8,5.8]){box(scene,x,3.2,-64,1.2,1.7,.08,mats.glass,false);box(scene,x,4.08,-64,1.35,.12,.18,interiorTrim,false)}
+const ceilingLight=new THREE.PointLight(0xffe2b8,1.5,18);ceilingLight.position.set(0,6.8,-67);scene.add(ceilingLight);
+const interiorLabel=box(scene,0,2.8,-76.72,4.8,.8,.12,mats.dark,false);
+box(scene,0,2.8,-76.62,3.9,.05,.05,mats.amber,false);
 const cars=[{x:-4,z:5},{x:4,z:-26}];car(-4,5,0x52656a);car(4,-26,0x8a8172);
 // Resident characters are distinct and visibly identifiable.
 const residents=[
@@ -129,12 +146,17 @@ function update(dt,t){
   move.normalize().multiplyScalar((keys.ShiftLeft||keys.ShiftRight?5.0:3.15)*dt);
   // Resolve movement per axis so the player cannot pass through parked vehicles.
   const nextX=camera.position.x+move.x,nextZ=camera.position.z+move.z;
-  const blocked=(x,z)=>cars.some(c=>Math.abs(x-c.x)<1.35&&Math.abs(z-c.z)<2.35);
+  const blockedCar=(x,z)=>cars.some(c=>Math.abs(x-c.x)<1.35&&Math.abs(z-c.z)<2.35);
+  const blocked=(x,z)=>blockedCar(x,z)||
+   (((camera.position.z>-59.7&&z<=-59.7)||(camera.position.z<=-59.7&&z>-59.7))&&Math.abs(x)>2.55)||
+   (z<-59&&z>-77.5&&Math.abs(x)>6.35)||
+   (z<=-77.5&&Math.abs(x)<6.7)||
+   (Math.abs(x)<3.15&&Math.abs(z+70.8)<1.25);
   if(!blocked(nextX,camera.position.z))camera.position.x=nextX;
   if(!blocked(camera.position.x,nextZ))camera.position.z=nextZ;
  }
- camera.position.x=THREE.MathUtils.clamp(camera.position.x,-5.45,5.45);
- camera.position.z=THREE.MathUtils.clamp(camera.position.z,-56,52);
+ camera.position.x=THREE.MathUtils.clamp(camera.position.x,-6.1,6.1);
+ camera.position.z=THREE.MathUtils.clamp(camera.position.z,-82,52);
  camera.position.y=1.72;
  camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;
  activeResident=nearestResident();
@@ -142,7 +164,7 @@ function update(dt,t){
  residents.forEach((r,i)=>{const g=r.person.group;if(r.state==='escorting'){const target=assembly.clone();target.x=(i-1)*1.05;const dir=target.clone().sub(g.position);const distance=dir.length();if(distance>.8){dir.normalize();g.position.addScaledVector(dir,1.3*dt);g.rotation.y=Math.atan2(dir.x,dir.z)}else{r.state='safe';assisted++;updateHud();toast(r.name+' reached the assembly point.');if(assisted===3){complete=true;setTimeout(()=>{completeScreen.classList.remove('hidden');document.exitPointerLock?.();document.querySelector('#final-count').textContent='03 / 03'},800)}}}else if(r.state==='waiting'){g.rotation.y=Math.sin(t*.35+i)*.12}r.person.legs.forEach((leg,j)=>{leg.rotation.x=r.state==='escorting'?Math.sin(t*7+j*Math.PI)*.35:Math.sin(t*1.2+j)*.025})});
  ring.material.opacity=.55+Math.sin(t*2)*.2;arrow.position.y=4.2+Math.sin(t*2)*.18;
  document.querySelector('#clock').textContent=new Date(8*3600*1000+42*60000+Math.floor(t*1000)).toISOString().slice(11,19);
- const z=camera.position.z;document.querySelector('#location').textContent=z<-38?'CIVIC QUARTER / COMMUNITY PLAZA':z<-15?'CIVIC QUARTER / NORTH AVENUE':z<8?'CIVIC QUARTER / EAST AVENUE':'CIVIC QUARTER / SOUTH AVENUE';
+ const z=camera.position.z;document.querySelector('#location').textContent=z<-59&&z>-79?'CIVIC QUARTER / COMMUNITY RESPONSE CENTER':z<-38?'CIVIC QUARTER / COMMUNITY PLAZA':z<-15?'CIVIC QUARTER / NORTH AVENUE':z<8?'CIVIC QUARTER / EAST AVENUE':'CIVIC QUARTER / SOUTH AVENUE';
 }
 function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04),t=clock.elapsedTime;if(started&&!paused&&!complete)update(dt,t);renderer.render(scene,camera)}
 animate();
