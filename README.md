@@ -53,3 +53,5 @@ This is an early playable prototype, not a finished commercial game. The current
 
 - Live team status: role-specific coordination, resident-support and welfare-liaison activity states update during the response.
 - After-action report: completion screen summarizes mission duration, decision score, dispatch updates resolved, information-verification choices, support actions and residents safely assisted.
+
+- Scenario selection: choose between a Civic Quarter power outage, Riverside severe-weather response and Central Station transit disruption. Each scenario has its own briefing, sector label and timed dispatch updates while retaining the shared resident-support gameplay loop.
