@@ -122,6 +122,22 @@ const scenarios={
  alarm:{title:'MARKET STREET ALARM CALL',sector:'SPECIAL RESPONSE / SECTOR 09',lead:'Unit 04 is assigned to a commercial alarm call on Market Street. Establish contact with the responsible parties, verify the available information and record a clear outcome.',description:'A commercial alarm call. Verify the report with responsible parties and preserve an accurate incident record.',event1:{id:'power',title:'DISPATCH / INFORMATION UPDATE 01',text:'The alarm provider cannot yet confirm the source of the alert. Keep the incident status pending verification.'},event2:{id:'medical',title:'SUPPORT REQUEST / UPDATE 02',text:'Dispatch advises that a staff member may require assistance. Coordinate a suitable support referral and record the result.'}}
 }
 let activeScenario=scenarios.welfare;
+
+const prepSelections={protection:'Standard protective vest',comms:'Radio and earpiece',support:'First aid pouch'};
+function readPreparation(){
+ prepSelections.protection=document.querySelector('#prep-protection')?.value||'Standard protective vest';
+ prepSelections.comms=document.querySelector('#prep-comms')?.value||'Radio and earpiece';
+ prepSelections.support=document.querySelector('#prep-support')?.value||'First aid pouch';
+ const ready=Object.values(prepSelections).every(Boolean);
+ const status=document.querySelector('#prep-readiness');
+ const kit=document.querySelector('#prep-kit-status');
+ if(status)status.textContent=ready?'PREPARATION READY':'CHECK REQUIRED';
+ if(kit)kit.textContent=ready?'3 EQUIPMENT CATEGORIES SELECTED':'CHECK EQUIPMENT';
+ return ready;
+}
+['#prep-protection','#prep-comms','#prep-support'].forEach(sel=>document.querySelector(sel)?.addEventListener('change',readPreparation));
+readPreparation();
+
 const scenarioSelect=document.querySelector('#scenario-select');
 scenarioSelect?.addEventListener('change',()=>{activeScenario=scenarios[scenarioSelect.value]||scenarios.welfare;document.querySelector('#brief-lead').textContent=activeScenario.lead;document.querySelector('#scenario-description').textContent=activeScenario.description;document.querySelector('#mission-title').textContent=activeScenario.title;document.querySelector('#mission-subline').textContent=activeScenario.sector;});
 let yaw=0,pitch=0,started=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false,radioReady=false,teamBriefed=false,radioEntries=[],missionStartElapsed=0,dispatchEventOne=false,dispatchEventTwo=false,activeDispatch=null,dispatchResolved=0,teamAssignments=[],teamActivities=[],briefingTask='Resident support',missionStartedAt=0,missionEndedAt=0,decisionScore=0,verifiedInfo=0,supportActions=0;
@@ -167,7 +183,7 @@ function updateHud(){
  if(eventCount)eventCount.textContent='UPDATES RESOLVED: '+dispatchResolved+'/2';
 }
 updateHud();
-function start(){started=true;paused=false;missionStartedAt=performance.now();missionStartElapsed=clock.elapsedTime;logRadio('DISPATCH: Response scenario confirmed — '+activeScenario.title+'.');briefing.classList.add('hidden');pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.();clock.getDelta()}
+function start(){if(!readPreparation()){toast('Complete the pre-deployment equipment check first.');return}started=true;paused=false;missionStartedAt=performance.now();missionStartElapsed=clock.elapsedTime;logRadio('DISPATCH: Response scenario confirmed — '+activeScenario.title+'.');logRadio('UNIT 04: Pre-deployment check complete. Protective equipment: '+prepSelections.protection+'. Communications: '+prepSelections.comms+'. Support kit: '+prepSelections.support+'.');briefing.classList.add('hidden');pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.();clock.getDelta()}
 document.querySelector('#start').addEventListener('click',start);
 document.querySelector('#resume').addEventListener('click',()=>{paused=false;pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.()});
 document.querySelector('#replay').addEventListener('click',()=>location.reload());
@@ -341,7 +357,7 @@ function update(dt,t){
     const duration=Math.max(0,Math.round((missionEndedAt-missionStartedAt)/1000));
     const mins=String(Math.floor(duration/60)).padStart(2,'0'),secs=String(duration%60).padStart(2,'0');
     const report=document.querySelector('#report-details');
-    if(report)report.innerHTML='<div><span>MISSION TIME</span><b>'+mins+':'+secs+'</b></div><div><span>DECISION SCORE</span><b>'+decisionScore+'</b></div><div><span>DISPATCH UPDATES</span><b>'+dispatchResolved+'/2</b></div><div><span>VERIFIED INFORMATION</span><b>'+verifiedInfo+'</b></div><div><span>SUPPORT ACTIONS</span><b>'+supportActions+'</b></div><div><span>RESIDENTS SAFE</span><b>'+assisted+'/3</b></div>';
+    if(report)report.innerHTML='<div><span>MISSION TIME</span><b>'+mins+':'+secs+'</b></div><div><span>DECISION SCORE</span><b>'+decisionScore+'</b></div><div><span>DISPATCH UPDATES</span><b>'+dispatchResolved+'/2</b></div><div><span>VERIFIED INFORMATION</span><b>'+verifiedInfo+'</b></div><div><span>SUPPORT ACTIONS</span><b>'+supportActions+'</b></div><div><span>PEOPLE ASSISTED</span><b>'+assisted+'/3</b></div><div><span>PROTECTIVE EQUIPMENT</span><b>'+prepSelections.protection+'</b></div><div><span>COMMUNICATIONS</span><b>'+prepSelections.comms+'</b></div><div><span>SUPPORT KIT</span><b>'+prepSelections.support+'</b></div>';
     setTimeout(()=>{completeScreen.classList.remove('hidden');document.exitPointerLock?.();document.querySelector('#final-count').textContent='03 / 03';document.querySelector('#final-rating').textContent=rating},800)
    }
   }
