@@ -93,3 +93,5 @@ The previous escort-to-plaza objective has been replaced. Each contact now requi
 - The browser test covers scenario selection, audio control, station briefing, deployment, radio check, resident conversations, scenario-specific dispatch decisions, incident closure, return to station, next call-out reset and career persistence.
 
 - Regression test interaction order corrected: the opening briefing overlay intentionally blocks the top-bar audio control until the operations room is entered. Audio toggling is now tested after entering the station.
+
+- Fixed a first-person interaction usability issue found during browser QA: opening a resident conversation now releases pointer lock so dialogue choices can be clicked; closing the conversation restores mouse-look when the mission is active.
