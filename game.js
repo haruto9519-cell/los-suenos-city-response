@@ -1,0 +1,142 @@
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js';
+
+const root=document.querySelector('#game');
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x9baeb4);
+scene.fog=new THREE.Fog(0x9baeb4,34,115);
+const camera=new THREE.PerspectiveCamera(74,innerWidth/innerHeight,.1,180);
+camera.position.set(0,1.72,13);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.8));
+renderer.setSize(innerWidth,innerHeight);
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.12;
+root.appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xdceaf0,0x4b5050,2.0));
+const sun=new THREE.DirectionalLight(0xffe2b6,2.6);
+sun.position.set(-22,34,15);sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-55;sun.shadow.camera.right=55;sun.shadow.camera.top=55;sun.shadow.camera.bottom=-55;
+scene.add(sun);
+
+const mat=(color,roughness=.85,metalness=0)=>new THREE.MeshStandardMaterial({color,roughness,metalness});
+const mats={
+ asphalt:mat(0x30383c),sidewalk:mat(0x858b89),concrete:mat(0xb4b5ac),white:mat(0xe0dfd5),
+ dark:mat(0x26343a),glass: new THREE.MeshStandardMaterial({color:0x49636b,roughness:.28,metalness:.35}),
+ brick:mat(0x8b7770),sand:mat(0xb8a38a),blue:mat(0x526d78),green:mat(0x526c58),yellow:mat(0xd4ad65),
+ roadline:mat(0xd9d5c7),leaf:mat(0x526b50),trunk:mat(0x57483c),amber:mat(0xdcae61)
+};
+function box(parent,x,y,z,w,h,d,material,shadow=true){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);m.position.set(x,y,z);m.castShadow=shadow;m.receiveShadow=true;parent.add(m);return m}
+function cylinder(parent,x,y,z,r1,r2,h,material,segments=12){const m=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,segments),material);m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m}
+function ground(){
+ box(scene,0,-.18,0,150,.35,150,mat(0x777e78),false);
+ box(scene,0,.005,0,12,.06,112,mats.asphalt,false);
+ box(scene,-9,.02,0,5,.12,112,mats.sidewalk,false);box(scene,9,.02,0,5,.12,112,mats.sidewalk,false);
+ box(scene,0,.04,0,.13,.02,105,mats.roadline,false);
+ for(let z=-48;z<55;z+=8){box(scene,-3,.045,z,2.1,.02,.11,mats.roadline,false);box(scene,3,.045,z,2.1,.02,.11,mats.roadline,false)}
+ for(const x of [-6.3,6.3])for(let z=-50;z<55;z+=8)box(scene,x,.11,z,.12,.1,3.6,mat(0x656d6d),false);
+}
+function makeBuilding(x,z,w,d,h,wall,seed=0){
+ const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
+ box(g,0,h/2,0,w,h,d,wall);
+ box(g,0,h+.08,0,w+.3,.18,d+.3,mats.dark);
+ const floors=Math.max(2,Math.floor(h/3.1)),cols=Math.max(2,Math.floor(w/2.8));
+ for(let f=0;f<floors;f++)for(let c=0;c<cols;c++){
+  const wx=-w/2+(c+.5)*w/cols,wy=1.35+f*2.7;
+  if(wy>h-.7)continue;
+  box(g,wx,wy,d/2+.018,w/cols*.55,1.35,.06,mats.glass,false);
+  box(g,wx,wy+.73,d/2+.04,w/cols*.62,.09,.12,mats.concrete,false);
+ }
+ // storefront and recessed entrance
+ if(h>7){box(g,0,1.7,d/2+.025,w*.28,2.9,.09,mats.dark,false);box(g,0,1.8,d/2+.085,w*.19,2.55,.04,mats.glass,false)}
+ box(g,0,.22,0,w+.15,.35,d+.15,mats.concrete,false);
+ // restrained facade details
+ for(let k=0;k<3;k++)box(g,-w*.35+k*w*.35,h*.72,d/2+.08,.12,.55,.12,mats.amber,false);
+ return g;
+}
+function tree(x,z,s=1){cylinder(scene,x,.9*s,z,.15*s,.23*s,1.8*s,mats.trunk);const crown=new THREE.Mesh(new THREE.IcosahedronGeometry(1.1*s,1),mats.leaf);crown.position.set(x,2*s,z);crown.castShadow=true;scene.add(crown)}
+function streetLamp(x,z){cylinder(scene,x,2.1,z,.07,.09,4.2,mat(0x343e42));box(scene,x+.55,4.1,z,.9,.08,.08,mat(0x343e42));const light=new THREE.PointLight(0xffd69a,.45,9);light.position.set(x+.9,3.9,z);scene.add(light)}
+function car(x,z,color){const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);box(g,0,.65,0,2.05,.65,4,mat(color,.45));box(g,0,1.15,-.2,1.65,.65,2.05,mats.glass);for(const wx of [-.86,.86])for(const wz of [-1.25,1.25]){const w=cylinder(g,wx,.38,wz,.36,.36,.18,mat(0x171c20),16);w.rotation.z=Math.PI/2}}
+function makePerson(x,z,shirt,pants,scale=1){
+ const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
+ const bodyMat=mat(shirt),legMat=mat(pants),skin=mat(0xc69b7a);
+ const torso=new THREE.Mesh(new THREE.CapsuleGeometry(.28*scale,.62*scale,4,8),bodyMat);torso.position.y=1.15*scale;torso.castShadow=true;g.add(torso);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.19*scale,12,10),skin);head.position.y=1.78*scale;head.castShadow=true;g.add(head);
+ const legs=[];for(const dx of [-.13,.13]){const leg=new THREE.Mesh(new THREE.CapsuleGeometry(.105*scale,.55*scale,3,7),legMat);leg.position.set(dx,.48*scale,0);g.add(leg);legs.push(leg)}
+ const arms=[];for(const dx of [-.34,.34]){const arm=new THREE.Mesh(new THREE.CapsuleGeometry(.09*scale,.48*scale,3,7),skin);arm.position.set(dx,1.2*scale,0);arm.rotation.z=dx>0?-.13:.13;g.add(arm);arms.push(arm)}
+ return {group:g,legs,arms};
+}
+ground();
+// A compact, authored city block with varied civic and commercial facades.
+makeBuilding(-15,-7,13,15,17,mats.brick);makeBuilding(15,-8,13,16,22,mats.sand);
+makeBuilding(-16,17,14,17,12,mats.blue);makeBuilding(16,18,14,16,15,mats.green);
+makeBuilding(-15,-31,15,16,19,mats.sand);makeBuilding(15,-32,15,15,14,mats.brick);
+makeBuilding(-31,-6,14,18,23,mats.blue);makeBuilding(31,-6,14,18,20,mats.sand);
+makeBuilding(-31,22,14,16,13,mats.green);makeBuilding(31,22,14,16,18,mats.blue);
+for(const x of [-8,8])for(const z of [-42,-26,-10,7,24,41]){streetLamp(x,z)}
+for(const x of [-10,10])for(const z of [-38,-22,-4,14,34])tree(x,z,.9);
+// Park-like community assembly plaza at the north end of the avenue.
+box(scene,0,.08,-48,21,.16,15,mats.concrete,false);
+box(scene,0,.18,-48,7,.08,5,mat(0x8b9d92),false);
+for(const x of [-8,8])for(const z of [-52,-44])tree(x,z,.85);
+box(scene,0,1.2,-54,7,2.3,.25,mats.dark);
+box(scene,0,2.5,-54,7,.12,.4,mats.amber);
+const signText=makePerson(0,0,0xffffff,0xffffff,.01);scene.remove(signText.group);
+car(-4,5,0x52656a);car(4,-26,0x8a8172);
+// Resident characters are distinct and visibly identifiable.
+const residents=[
+ {person:makePerson(-3.7,-5,0x9a715b,0x303d49),state:'waiting',name:'Resident A'},
+ {person:makePerson(3.4,-14,0x667f86,0x4b4d49),state:'waiting',name:'Resident B'},
+ {person:makePerson(-2.7,-23,0x9b9b72,0x343c48),state:'waiting',name:'Resident C'}
+];
+residents.forEach((r,i)=>{r.person.group.userData.resident=i});
+const assembly=new THREE.Vector3(0,0,-49);
+const ring=new THREE.Mesh(new THREE.RingGeometry(3.2,3.55,48),new THREE.MeshBasicMaterial({color:0x75d0b0,side:THREE.DoubleSide,transparent:true,opacity:.8}));
+ring.rotation.x=-Math.PI/2;ring.position.set(0,.22,-48);scene.add(ring);
+const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,4,12),new THREE.MeshBasicMaterial({color:0x7bd0b0,transparent:true,opacity:.24}));beacon.position.set(0,2.1,-48);scene.add(beacon);
+const arrow=new THREE.Mesh(new THREE.ConeGeometry(.55,1.3,4),new THREE.MeshBasicMaterial({color:0xe7b65f}));arrow.rotation.x=Math.PI;arrow.position.set(0,4.4,-48);scene.add(arrow);
+
+let yaw=0,pitch=0,started=false,paused=false,complete=false,assisted=0,activeResident=null;
+const keys={};const clock=new THREE.Clock();
+const interaction=document.querySelector('#interaction');
+const interactionText=document.querySelector('#interaction-text');
+const briefing=document.querySelector('#briefing'),pauseScreen=document.querySelector('#pause'),completeScreen=document.querySelector('#complete');
+function toast(message){const el=document.querySelector('#toast');el.textContent=message;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1900)}
+function updateHud(){document.querySelector('#objective-count').innerHTML='Residents assisted <strong>'+assisted+' / 3</strong>';document.querySelector('#progress-fill').style.width=(assisted/3*100)+'%'}
+function start(){started=true;paused=false;briefing.classList.add('hidden');pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.();clock.getDelta()}
+document.querySelector('#start').addEventListener('click',start);
+document.querySelector('#resume').addEventListener('click',()=>{paused=false;pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.()});
+document.querySelector('#replay').addEventListener('click',()=>location.reload());
+document.addEventListener('pointerlockchange',()=>{if(started&&!complete&&document.pointerLockElement!==renderer.domElement&&!paused){paused=true;pauseScreen.classList.remove('hidden')}});
+document.addEventListener('mousemove',e=>{if(document.pointerLockElement===renderer.domElement){yaw-=e.movementX*.0022;pitch-=e.movementY*.0018;pitch=Math.max(-1.25,Math.min(1.25,pitch))}});
+document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Escape'&&started&&!complete){paused=true;pauseScreen.classList.remove('hidden')}if(e.code==='KeyE'&&started&&!paused&&!complete)interact()});
+document.addEventListener('keyup',e=>keys[e.code]=false);
+renderer.domElement.addEventListener('click',()=>{if(started&&!paused&&!complete&&document.pointerLockElement!==renderer.domElement)renderer.domElement.requestPointerLock?.()});
+function interact(){if(!activeResident)return;const r=activeResident;if(r.state!=='waiting')return;r.state='escorting';r.person.group.traverse(o=>{if(o.material?.color)o.material.color.set(0x79a995)});toast('Resident acknowledged. Continue to the assembly point.');interaction.classList.remove('visible');activeResident=null}
+function nearestResident(){let nearest=null,dist=3.4;for(const r of residents){if(r.state!=='waiting')continue;const d=camera.position.distanceTo(r.person.group.position);if(d<dist){dist=d;nearest=r}}return nearest}
+function update(dt,t){
+ const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
+ const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
+ const move=new THREE.Vector3();
+ if(keys.KeyW||keys.ArrowUp)move.add(forward);
+ if(keys.KeyS||keys.ArrowDown)move.sub(forward);
+ if(keys.KeyD||keys.ArrowRight)move.add(right);
+ if(keys.KeyA||keys.ArrowLeft)move.sub(right);
+ if(move.lengthSq()>0){move.normalize().multiplyScalar((keys.ShiftLeft||keys.ShiftRight?5.0:3.15)*dt);camera.position.add(move)}
+ camera.position.x=THREE.MathUtils.clamp(camera.position.x,-7.2,7.2);
+ camera.position.z=THREE.MathUtils.clamp(camera.position.z,-56,52);
+ camera.position.y=1.72;
+ camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;
+ activeResident=nearestResident();
+ if(activeResident){interaction.classList.add('visible');interactionText.textContent='OFFER ASSISTANCE · '+activeResident.name.toUpperCase()}else interaction.classList.remove('visible');
+ residents.forEach((r,i)=>{const g=r.person.group;if(r.state==='escorting'){const target=assembly.clone();target.x=(i-1)*1.05;const dir=target.clone().sub(g.position);const distance=dir.length();if(distance>.8){dir.normalize();g.position.addScaledVector(dir,1.3*dt);g.rotation.y=Math.atan2(dir.x,dir.z)}else{r.state='safe';assisted++;updateHud();toast(r.name+' reached the assembly point.');if(assisted===3){complete=true;setTimeout(()=>{completeScreen.classList.remove('hidden');document.exitPointerLock?.();document.querySelector('#final-count').textContent='03 / 03'},800)}}}else if(r.state==='waiting'){g.rotation.y=Math.sin(t*.35+i)*.12}r.person.legs.forEach((leg,j)=>{leg.rotation.x=r.state==='escorting'?Math.sin(t*7+j*Math.PI)*.35:Math.sin(t*1.2+j)*.025})});
+ ring.material.opacity=.55+Math.sin(t*2)*.2;arrow.position.y=4.2+Math.sin(t*2)*.18;
+ document.querySelector('#clock').textContent=new Date(8*3600*1000+42*60000+Math.floor(t*1000)).toISOString().slice(11,19);
+ const z=camera.position.z;document.querySelector('#location').textContent=z<-38?'CIVIC QUARTER / COMMUNITY PLAZA':z<-15?'CIVIC QUARTER / NORTH AVENUE':z<8?'CIVIC QUARTER / EAST AVENUE':'CIVIC QUARTER / SOUTH AVENUE';
+}
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04),t=clock.elapsedTime;if(started&&!paused&&!complete)update(dt,t);renderer.render(scene,camera)}
+animate();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.8))});
