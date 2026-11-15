@@ -116,7 +116,7 @@ ring.rotation.x=-Math.PI/2;ring.position.set(0,.22,-48);scene.add(ring);
 const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,4,12),new THREE.MeshBasicMaterial({color:0x7bd0b0,transparent:true,opacity:.24}));beacon.position.set(0,2.1,-48);scene.add(beacon);
 const arrow=new THREE.Mesh(new THREE.ConeGeometry(.55,1.3,4),new THREE.MeshBasicMaterial({color:0xe7b65f}));arrow.rotation.x=Math.PI;arrow.position.set(0,4.4,-48);scene.add(arrow);
 
-let yaw=0,pitch=0,started=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false;
+let yaw=0,pitch=0,started=false,paused=false,complete=false,assisted=0,activeResident=null,selectedResident=null,dialogueOpen=false,radioReady=false;
 const keys={};const clock=new THREE.Clock();
 
 const interaction=document.querySelector('#interaction');
@@ -135,6 +135,10 @@ function updateHud(){
   status.textContent=labels[r.state]||'UNKNOWN';
   row.dataset.state=r.state;
  });
+ const radioState=document.querySelector('#radio-state');
+ const radioLog=document.querySelector('#radio-log');
+ if(radioState)radioState.textContent=radioReady?'LINK ESTABLISHED':'AWAITING RADIO CHECK';
+ if(radioLog)radioLog.textContent=radioReady?'UNIT 04: ON SCENE. REQUESTING INCIDENT UPDATE.':'NO OUTBOUND REPORT RECORDED';
 }
 updateHud();
 function start(){started=true;paused=false;briefing.classList.add('hidden');pauseScreen.classList.add('hidden');renderer.domElement.requestPointerLock?.();clock.getDelta()}
@@ -143,7 +147,16 @@ document.querySelector('#resume').addEventListener('click',()=>{paused=false;pau
 document.querySelector('#replay').addEventListener('click',()=>location.reload());
 document.addEventListener('pointerlockchange',()=>{if(started&&!complete&&!dialogueOpen&&document.pointerLockElement!==renderer.domElement&&!paused){paused=true;pauseScreen.classList.remove('hidden')}});
 document.addEventListener('mousemove',e=>{if(document.pointerLockElement===renderer.domElement){yaw-=e.movementX*.0022;pitch-=e.movementY*.0018;pitch=Math.max(-1.25,Math.min(1.25,pitch))}});
-document.addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Escape'&&dialogueOpen){closeDialogue();return}if(e.code==='Escape'&&started&&!complete){paused=true;pauseScreen.classList.remove('hidden')}if(e.code==='KeyE'&&started&&!paused&&!complete)interact()});
+document.addEventListener('keydown',e=>{
+ keys[e.code]=true;
+ if(e.code==='Escape'&&dialogueOpen){closeDialogue();return}
+ if(e.code==='Escape'&&started&&!complete){paused=true;pauseScreen.classList.remove('hidden')}
+ if(e.code==='KeyR'&&started&&!paused&&!complete&&!radioReady){
+  radioReady=true;updateHud();
+  toast('Dispatch: radio check acknowledged. Unit 04 is on the incident channel.');
+ }
+ if(e.code==='KeyE'&&started&&!paused&&!complete)interact()
+});
 document.addEventListener('keyup',e=>keys[e.code]=false);
 renderer.domElement.addEventListener('click',()=>{if(started&&!paused&&!complete&&document.pointerLockElement!==renderer.domElement)renderer.domElement.requestPointerLock?.()});
 function openDialogue(r){
@@ -165,6 +178,7 @@ function chooseDialogue(choice){
   r.needsDiscussed=true;dialogueLine.textContent=r.need;
   toast('You listened to the resident.');
  }else if(choice==='guide'){
+  if(!radioReady){dialogueLine.textContent='Before we move, please establish radio contact with dispatch. Press R to complete the radio check.';toast('Dispatch contact required before escort.');return}
   r.state='escorting';r.person.group.traverse(o=>{if(o.material?.color)o.material.color.set(0x79a995)});
   dialogueLine.textContent='Thank you. I will walk with you to the community plaza.';
   toast(r.name+' accepted your offer to accompany them.');
@@ -221,7 +235,7 @@ function update(dt,t){
    if(assisted===3){
     complete=true;
     const thoughtfulSupport=residents.filter(person=>person.informed&&person.needsDiscussed).length;
-    const rating=thoughtfulSupport===3?'EXCELLENT':thoughtfulSupport>=1?'COMMENDABLE':'COMPLETED';
+    const rating=!radioReady?'COMMS INCOMPLETE':thoughtfulSupport===3?'EXCELLENT':thoughtfulSupport>=1?'COMMENDABLE':'COMPLETED';
     setTimeout(()=>{completeScreen.classList.remove('hidden');document.exitPointerLock?.();document.querySelector('#final-count').textContent='03 / 03';document.querySelector('#final-rating').textContent=rating},800)
    }
   }
