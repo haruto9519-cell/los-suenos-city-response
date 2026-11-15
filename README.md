@@ -60,7 +60,7 @@ This is an early playable prototype, not a finished commercial game. The current
 ## Direction update — police incident-response simulation
 The project direction is now a fictional police special-response unit simulator with a grounded procedural tone inspired by Ready or Not's presentation and mission structure. The current playable loop focuses on dispatch communication, civilian interviews, welfare needs, verified information, documented contact outcomes and incident reporting. It does not model real-world weapon handling, tactical entry or assault procedures.
 
-The call-out selector offers Civic Quarter Welfare Check, Civic Quarter Missing Person Follow-up, and Market Street Commercial Alarm. These currently share the existing Civic Quarter environment and three-contact casework loop; unique maps and distinct mission-specific NPC behavior remain future work.
+The call-out selector offers Civic Quarter Welfare Check, Civic Quarter Missing Person Follow-up, and Market Street Commercial Alarm. Each call-out now loads its own three named contacts, opening statements and information needs. These currently share the existing Civic Quarter environment and three-contact casework loop; unique maps and distinct mission-specific NPC behavior remain future work.
 
 
 ## Pre-deployment preparation
