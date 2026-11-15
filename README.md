@@ -84,3 +84,5 @@ The previous escort-to-plaza objective has been replaced. Each contact now requi
 
 - Added a post-call lifecycle: after returning to the operations room, select a new call-out. Mission counters, dispatch updates, resident states, briefing and contact records reset without resetting saved career progression. Re-deploying a completed incident is blocked.
 - Audio now reuses one Web Audio context and fades the ambient layer in/out instead of creating a new context on every toggle.
+
+- Dispatch updates now present scenario-specific decision labels and record distinct outcomes for all five call-outs. The incident log differentiates unverified information, corroboration requests, welfare referrals and follow-up arrangements.
