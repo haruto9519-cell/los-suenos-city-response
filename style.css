@@ -79,3 +79,18 @@
 .scenario-select label{color:#d8b779}
 .mission-panel .panel-head>span:first-child{letter-spacing:1.4px}
 .status-pill{border-color:rgba(191,155,93,.42)}
+
+/* Pre-deployment preparation room */
+.brief-card{max-height:calc(100dvh - 28px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:#65747a #152129}
+.prep-room{margin:16px 0 4px;padding:13px;background:linear-gradient(145deg,rgba(39,52,59,.72),rgba(12,20,26,.82));border:1px solid rgba(188,199,194,.18);border-left:2px solid var(--amber);text-align:left}
+.prep-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.prep-heading span,.prep-footer span{font-size:8px;letter-spacing:1.2px;color:#a9b5b8}
+.prep-heading b{font-size:8px;letter-spacing:1px;color:#83c2a2}
+.prep-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.prep-field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.prep-field:first-child{grid-column:1/-1}
+.prep-field>span{font-size:8px;letter-spacing:1px;color:#b7c1c2}
+.prep-field select{width:100%;min-width:0;padding:9px 8px;background:#101a20;border:1px solid #536168;color:#e5e9e7;font:600 9px Inter,sans-serif}
+.prep-footer{display:flex;flex-wrap:wrap;gap:7px 10px;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid #ffffff18}
+.prep-footer b{font-size:8px;letter-spacing:.5px;color:#e0c28d}
+@media(max-width:600px){.brief-card{padding:24px 20px}.prep-grid{grid-template-columns:1fr}.prep-field:first-child{grid-column:auto}.brief-card h1{font-size:56px}}
