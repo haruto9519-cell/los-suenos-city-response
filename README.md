@@ -55,3 +55,9 @@ This is an early playable prototype, not a finished commercial game. The current
 - After-action report: completion screen summarizes mission duration, decision score, dispatch updates resolved, information-verification choices, support actions and residents safely assisted.
 
 - Scenario selection: choose between a Civic Quarter power outage, Riverside severe-weather response and Central Station transit disruption. Each scenario has its own briefing, sector label and timed dispatch updates while retaining the shared resident-support gameplay loop.
+
+
+## Direction update — police incident-response simulation
+The project direction is now a fictional police special-response unit simulator with a grounded procedural tone inspired by Ready or Not's presentation and mission structure. The current playable loop focuses on dispatch communication, civilian contact, welfare support, verified information and incident reporting. It does not model real-world weapon handling, tactical entry or assault procedures.
+
+The call-out selector offers Civic Quarter Welfare Check, Civic Quarter Missing Person Follow-up, and Market Street Commercial Alarm. These currently share the existing Civic Quarter environment and civilian-support gameplay loop; unique maps and distinct mission-specific NPC behavior remain future work.
