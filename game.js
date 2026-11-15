@@ -194,7 +194,6 @@ function applyScenarioContacts(){
  });
  updateHud();
 }
-applyScenarioContacts();
 
 
 /* 3D Unit 04 operations room and standing team roster. */
