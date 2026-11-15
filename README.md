@@ -13,6 +13,8 @@ A browser-based 3D public-safety response game prototype. This original project 
 - Residents follow the player in a loose formation after accepting an escort; the player must lead them into the marked community plaza to complete the mission.
 - Mission HUD, progress tracking, pause/resume and completion screen.
 - Incident command radio check: establish dispatch communications with R before offering an escort; command status is shown in the HUD.
+- Response-team assignments: give three distinct coordination, resident-liaison and medical-liaison responsibilities, select the mission task and issue a team briefing before escort activity.
+- Radio traffic log records dispatch check-ins, team briefings and resident-assistance updates.
 - Responsive interface; keyboard and mouse are currently the intended control scheme.
 
 ## Controls
