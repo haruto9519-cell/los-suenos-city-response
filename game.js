@@ -190,7 +190,31 @@ function update(dt,t){
  camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;
  activeResident=dialogueOpen?null:nearestResident();
  if(activeResident){interaction.classList.add('visible');interactionText.textContent='TALK · '+activeResident.name.toUpperCase()}else interaction.classList.remove('visible');
- residents.forEach((r,i)=>{const g=r.person.group;if(r.state==='escorting'){const target=assembly.clone();target.x=(i-1)*1.05;const dir=target.clone().sub(g.position);const distance=dir.length();if(distance>.8){dir.normalize();g.position.addScaledVector(dir,1.3*dt);g.rotation.y=Math.atan2(dir.x,dir.z)}else{r.state='safe';assisted++;updateHud();toast(r.name+' reached the assembly point.');if(assisted===3){complete=true;const thoughtfulSupport=residents.filter(person=>person.informed&&person.needsDiscussed).length;const rating=thoughtfulSupport===3?'EXCELLENT':thoughtfulSupport>=1?'COMMENDABLE':'COMPLETED';setTimeout(()=>{completeScreen.classList.remove('hidden');document.exitPointerLock?.();document.querySelector('#final-count').textContent='03 / 03';document.querySelector('#final-rating').textContent=rating},800)}}}else if(r.state==='waiting'){g.rotation.y=Math.sin(t*.35+i)*.12}r.person.legs.forEach((leg,j)=>{leg.rotation.x=r.state==='escorting'?Math.sin(t*7+j*Math.PI)*.35:Math.sin(t*1.2+j)*.025})});
+ residents.forEach((r,i)=>{
+ const g=r.person.group;let walking=false;
+ if(r.state==='escorting'){
+  // Residents follow the player in a loose, readable formation instead of
+  // teleporting toward the destination. The player must lead them to the plaza.
+  const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
+  const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
+  const target=camera.position.clone().sub(forward.clone().multiplyScalar(1.8+Math.floor(i/2)*.85));
+  target.add(right.multiplyScalar((i-1)*.8));
+  const dir=target.sub(g.position);dir.y=0;
+  const distance=dir.length();
+  if(distance>1.15){dir.normalize();g.position.addScaledVector(dir,Math.min(1.75*dt,distance-1.05));g.rotation.y=Math.atan2(dir.x,dir.z);walking=true}
+  const atPlaza=camera.position.distanceTo(assembly)<4.2&&g.position.distanceTo(assembly)<5.8;
+  if(atPlaza){
+   r.state='safe';assisted++;updateHud();toast(r.name+' has arrived at the community plaza.');
+   if(assisted===3){
+    complete=true;
+    const thoughtfulSupport=residents.filter(person=>person.informed&&person.needsDiscussed).length;
+    const rating=thoughtfulSupport===3?'EXCELLENT':thoughtfulSupport>=1?'COMMENDABLE':'COMPLETED';
+    setTimeout(()=>{completeScreen.classList.remove('hidden');document.exitPointerLock?.();document.querySelector('#final-count').textContent='03 / 03';document.querySelector('#final-rating').textContent=rating},800)
+   }
+  }
+ }else if(r.state==='waiting'){g.rotation.y=Math.sin(t*.35+i)*.12}
+ r.person.legs.forEach((leg,j)=>{leg.rotation.x=walking?Math.sin(t*7+j*Math.PI)*.35:Math.sin(t*1.2+j)*.025});
+});
  ring.material.opacity=.55+Math.sin(t*2)*.2;arrow.position.y=4.2+Math.sin(t*2)*.18;
  document.querySelector('#clock').textContent=new Date(8*3600*1000+42*60000+Math.floor(t*1000)).toISOString().slice(11,19);
  const z=camera.position.z;document.querySelector('#location').textContent=z<-59&&z>-79?'CIVIC QUARTER / COMMUNITY RESPONSE CENTER':z<-38?'CIVIC QUARTER / COMMUNITY PLAZA':z<-15?'CIVIC QUARTER / NORTH AVENUE':z<8?'CIVIC QUARTER / EAST AVENUE':'CIVIC QUARTER / SOUTH AVENUE';
