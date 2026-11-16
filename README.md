@@ -14,6 +14,7 @@ A browser-based 3D police-life simulation prototype set in the fictional West Co
 - Storefronts display OPEN/CLOSED signs using different business hours for markets, cafes, pharmacies and diners.
 - A gradual day/dawn/dusk/night cycle changes sky color, fog and lighting; shop status updates with the in-game clock.
 - Four public benches along the sidewalks; the player can sit for a short rest and stand up again on PC or mobile.
+- One furnished walk-in cafe interior with a marked entrance, counter, menu board, tables and usable exit; movement is bounded to the room.
 - Coordinated two-axis traffic lights with green, yellow and red phases; ambient cars stop at the intersection line when their direction is not permitted.
 - Dispatch sign-on, one routine neighborhood-assistance call, scene marker, arrival report and resident conversation.
 - Contact-documentation flow and shift log.
